@@ -1,0 +1,30 @@
+{
+  "name": "offline-mfe-poc",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm --filter ./apps/shell --filter ./apps/bookings-mfe --filter ./apps/dining-mfe --filter ./apps/payment-mfe run build",
+    "build:static": "node scripts/build-static-demo.mjs",
+    "ship:server": "pnpm --filter ship-server run start",
+    "ship:server:dev": "pnpm --filter ship-server run dev",
+    "ship:build": "node scripts/build-release.mjs",
+    "ship:package": "node scripts/package-release.mjs",
+    "ship:validate": "node scripts/validate-release.mjs",
+    "ship:deploy": "node scripts/deploy-ship.mjs",
+    "ship:activate": "node scripts/activate-release.mjs",
+    "ship:rollback": "node scripts/rollback-release.mjs",
+    "ship:status": "node scripts/status.mjs",
+    "ship:break": "node scripts/break-release.mjs",
+    "seed": "node scripts/seed-releases.mjs",
+    "test": "vitest run",
+    "typecheck": "bash -c 'for d in apps/shell apps/bookings-mfe apps/dining-mfe apps/payment-mfe; do echo \"> $d\"; tsc --noEmit -p $d/tsconfig.json || exit 1; done'"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.4"
+  }
+}

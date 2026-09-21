@@ -1,0 +1,8 @@
+{
+  "buildCommand": "pnpm run build:static",
+  "outputDirectory": "deploy",
+  "rewrites": [
+    { "source": "/api/session", "destination": "/api/session.json" },
+    { "source": "/((?!mfe/|config/|api/|.*\\..*).*)", "destination": "/index.html" }
+  ]
+}

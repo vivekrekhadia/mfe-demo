@@ -1,0 +1,71 @@
+/* Design tokens, as CSS custom properties, so any app (Shell or an MFE)
+   that imports this file gets a consistent palette without redeclaring it.
+   Mirrors the values in ./tokens.ts. */
+:root {
+  --ds-color-navy: #0b1f33;
+  --ds-color-navy-light: #12314f;
+  --ds-color-background: #f4f7fa;
+  --ds-color-success: #2f6f3f;
+  --ds-color-success-bg: #eef6ee;
+  --ds-color-danger: #a12727;
+  --ds-color-danger-bg: #fdf1f1;
+
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 10px;
+  --ds-radius-pill: 999px;
+
+  --ds-space-xs: 4px;
+  --ds-space-sm: 8px;
+  --ds-space-md: 16px;
+  --ds-space-lg: 24px;
+
+  --ds-font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.ds-button {
+  font: inherit;
+  font-family: var(--ds-font-sans);
+  border-radius: var(--ds-radius-sm);
+  padding: 6px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.ds-button-primary {
+  background: var(--ds-color-navy);
+  color: white;
+}
+
+.ds-button-secondary {
+  background: transparent;
+  border-color: var(--ds-color-navy);
+  color: var(--ds-color-navy);
+}
+
+.ds-badge {
+  display: inline-block;
+  font-family: var(--ds-font-sans);
+  font-size: 13px;
+  padding: var(--ds-space-xs) var(--ds-space-sm);
+  border-radius: var(--ds-radius-pill);
+}
+
+.ds-badge-neutral {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.ds-badge-success {
+  background: var(--ds-color-success-bg);
+  color: var(--ds-color-success);
+  font-weight: 600;
+}
+
+.ds-card {
+  font-family: var(--ds-font-sans);
+  background: white;
+  border-radius: var(--ds-radius-md);
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}

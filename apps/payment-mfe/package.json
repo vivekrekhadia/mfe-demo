@@ -1,0 +1,24 @@
+{
+  "name": "@mfe/payment-mfe",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "rspack dev",
+    "build": "rspack build"
+  },
+  "dependencies": {
+    "@mfe/design-system": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@module-federation/runtime-tools": "^2.9.0",
+    "@rspack/cli": "^2.2.5",
+    "@rspack/core": "^2.2.5",
+    "@rspack/dev-server": "^2.2.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.2"
+  }
+}

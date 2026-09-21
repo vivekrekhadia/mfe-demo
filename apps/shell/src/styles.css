@@ -1,0 +1,144 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #0b1f33;
+  color: #0b1f33;
+}
+
+.shell-app {
+  min-height: 100vh;
+  background: #f4f7fa;
+}
+
+.shell-header {
+  background: #0b1f33;
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shell-header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.shell-nav {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #12314f;
+}
+
+.nav-tab {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.nav-tab-active {
+  background: white;
+  color: #0b1f33;
+  font-weight: 600;
+}
+
+.release-bar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 24px;
+  background: #dce7f2;
+  color: #12314f;
+  font-size: 13px;
+}
+
+.shell-main {
+  padding: 24px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.mfe-slot {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  min-height: 120px;
+}
+
+.mfe-slot-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667;
+  font-size: 14px;
+}
+
+.mfe-slot-error {
+  border: 1px solid #e2a2a2;
+  background: #fdf1f1;
+}
+
+.mfe-slot-error-title {
+  font-weight: 600;
+  color: #a12727;
+  margin: 0 0 4px;
+}
+
+.mfe-slot-error-detail {
+  margin: 0 0 12px;
+  color: #7a2f2f;
+  font-size: 14px;
+}
+
+.mfe-panel h2 {
+  margin-top: 0;
+}
+
+.mfe-row {
+  border-top: 1px solid #eaeef2;
+  padding: 12px 0;
+}
+
+.mfe-row:first-of-type {
+  border-top: none;
+}
+
+.mfe-row-title {
+  font-weight: 600;
+}
+
+.mfe-detail {
+  margin-top: 12px;
+  padding: 10px;
+  background: #eef6ee;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.mfe-note {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #2f6f3f;
+  font-weight: 600;
+}
+
+.mfe-amount {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 4px 0 16px;
+}
+
+button {
+  font: inherit;
+}

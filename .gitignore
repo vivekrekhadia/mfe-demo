@@ -1,0 +1,16 @@
+node_modules
+dist
+deploy
+releases/*
+!releases/.gitkeep
+apps/ship-server/public/mfe/releases/*
+!apps/ship-server/public/mfe/releases/.gitkeep
+apps/ship-server/public/shell/*
+!apps/ship-server/public/shell/.gitkeep
+apps/ship-server/public/config/mfe-manifest.json
+apps/ship-server/public/config/mfe-manifest.json.tmp
+apps/ship-server/state/*
+!apps/ship-server/state/.gitkeep
+*.tar.gz
+*.sha256
+*.log
