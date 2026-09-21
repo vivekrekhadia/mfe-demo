@@ -1,0 +1,42 @@
+/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@layer theme {
+  :root, :host {
+    --color-white: #fff;
+    --spacing: 0.25rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
+    --color-ds-navy: var(--ds-color-navy);
+    --radius-ds-pill: var(--ds-radius-pill);
+  }
+}
+@layer theme;
+@layer utilities {
+  .flex {
+    display: flex;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
+  }
+  .rounded-ds-pill {
+    border-radius: var(--radius-ds-pill);
+  }
+  .bg-ds-navy {
+    background-color: var(--color-ds-navy);
+  }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
+  }
+  .py-1 {
+    padding-block: var(--spacing);
+  }
+  .text-xs {
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .text-white {
+    color: var(--color-white);
+  }
+}

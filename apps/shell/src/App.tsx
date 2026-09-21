@@ -21,7 +21,10 @@ export function App() {
   return (
     <div className="shell-app">
       <header className="shell-header">
-        <h1>Cruise Ship Portal</h1>
+        <div className="flex items-center gap-2">
+          <h1>Cruise Ship Portal</h1>
+          <span className="rounded-ds-pill bg-ds-navy-light px-3 py-1 text-xs text-white">Tailwind-styled tag</span>
+        </div>
         <SessionBadge />
       </header>
 

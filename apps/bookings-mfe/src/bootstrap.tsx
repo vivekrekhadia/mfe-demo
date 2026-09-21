@@ -1,6 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "@mfe/design-system/styles.css";
+// Only for standalone dev parity with what the Shell provides in
+// production (see BookingsApp.tsx for why this doesn't live there).
+import "@mfe/design-system/tailwind.css";
 import { BookingsApp } from "./BookingsApp";
 
 // Standalone entry point used only for isolated development of this MFE

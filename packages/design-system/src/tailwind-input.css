@@ -1,0 +1,14 @@
+/* Source for the generated ./tailwind.css — run `pnpm run build:css` in this
+   package after editing this file (or ./tailwind-theme.css / ./styles.css)
+   to regenerate it. This is the ONLY app/package in the workspace that
+   pulls in Preflight (Tailwind's global CSS reset) — every consumer
+   imports this compiled file exactly once (see apps/shell/src/bootstrap.tsx)
+   so there's a single reset on the page, never one per MFE.
+
+   source(none) turns off Tailwind v4's automatic content scanning: nothing
+   in this package's own source uses Tailwind utility classes, and scanning
+   shouldn't reach into apps/* — each MFE scans its own source independently
+   via its own tailwind-input.css (theme + utilities only, no Preflight;
+   see apps/bookings-mfe/src/tailwind-input.css for the pattern). */
+@import "tailwindcss" source(none);
+@import "./tailwind-theme.css";

@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "rspack dev",
-    "build": "rspack build"
+    "dev": "pnpm run build:css && rspack dev",
+    "build:css": "tailwindcss -i ./src/tailwind-input.css -o ./src/tailwind.css",
+    "build": "pnpm run build:css && rspack build"
   },
   "dependencies": {
     "@mfe/design-system": "workspace:*",
@@ -20,8 +21,10 @@
     "@rspack/cli": "^2.2.5",
     "@rspack/core": "^2.2.5",
     "@rspack/dev-server": "^2.2.1",
+    "@tailwindcss/cli": "4.3.3",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "tailwindcss": "4.3.3",
     "typescript": "^5.6.2"
   }
 }

@@ -14,3 +14,5 @@ apps/ship-server/state/*
 *.tar.gz
 *.sha256
 *.log
+apps/shell/.env.local
+apps/shell/public/manifest.local.json

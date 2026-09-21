@@ -1,6 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "@mfe/design-system/styles.css";
+// Only for standalone dev parity with what the Shell provides in
+// production (see DiningApp.tsx for why this doesn't live there).
+import "@mfe/design-system/tailwind.css";
 import { DiningApp } from "./DiningApp";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

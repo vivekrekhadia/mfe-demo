@@ -26,6 +26,7 @@ body {
 .shell-header h1 {
   margin: 0;
   font-size: 20px;
+  font-weight: 600;
 }
 
 .shell-nav {
@@ -101,8 +102,19 @@ body {
   font-size: 14px;
 }
 
+/* Explicit here because Tailwind's Preflight (imported once in
+   bootstrap.tsx) resets h1-h6 to font-size/font-weight: inherit — these
+   used to come from the browser's default UA stylesheet, silently, until
+   Preflight was added. */
 .mfe-panel h2 {
   margin-top: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.mfe-panel h3 {
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .mfe-row {

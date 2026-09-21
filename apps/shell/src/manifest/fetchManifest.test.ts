@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { fetchManifest } from "./fetchManifest";
+import { MANIFEST_PATH } from "@mfe/shared-config";
+import { fetchManifest, resolveManifestUrl } from "./fetchManifest";
 
 const validManifest = {
   release: "2026.09.01",
@@ -20,6 +21,15 @@ function fakeFetch(status: number, body: unknown): typeof fetch {
     }) as Response) as typeof fetch;
 }
 
+describe("resolveManifestUrl", () => {
+  it("falls back to the real Ship Server manifest path outside a bundled build", () => {
+    // MFE_MANIFEST_URL only exists as a literal once rspack's DefinePlugin
+    // substitutes it (see rspack.config.mjs); under Vitest it's never
+    // declared, so this should always resolve to the production default.
+    expect(resolveManifestUrl()).toBe(MANIFEST_PATH);
+  });
+});
+
 describe("fetchManifest", () => {
   it("loads a valid manifest served by the Ship Server", async () => {
     const result = await fetchManifest(fakeFetch(200, validManifest));
@@ -27,6 +37,16 @@ describe("fetchManifest", () => {
     if (result.ok) {
       expect(result.manifest.release).toBe("2026.09.01");
     }
+  });
+
+  it("fetches from an explicitly passed manifestUrl (dev override)", async () => {
+    let requestedUrl = "";
+    const spyFetch = (async (url: string) => {
+      requestedUrl = url;
+      return { ok: true, status: 200, json: async () => validManifest } as Response;
+    }) as typeof fetch;
+    await fetchManifest(spyFetch, "http://localhost:5000/manifest.local.json");
+    expect(requestedUrl).toMatch(/^http:\/\/localhost:5000\/manifest\.local\.json\?ts=/);
   });
 
   it("reports an error when the Ship Server responds with a non-OK status", async () => {

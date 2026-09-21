@@ -1,0 +1,33 @@
+/* The single source of truth for Tailwind's theme across the whole
+   workspace. Imported two ways:
+   - by ./tailwind-input.css (below), as part of this package's own full
+     Preflight + theme + utilities build
+   - directly by each MFE's own tailwind-input.css (`@import
+     "@mfe/design-system/tailwind-theme.css" layer(theme);`), so every app
+     generates utilities (bg-ds-navy, etc.) against the exact same theme
+     values without each also pulling in a second copy of Preflight.
+
+   Reuses the CSS custom properties already declared in ./styles.css's
+   :root (which every app already imports) instead of duplicating the
+   literal values from ./tokens.ts, so there's still exactly one place
+   that owns the actual color/spacing/radius numbers. */
+@theme {
+  --color-ds-navy: var(--ds-color-navy);
+  --color-ds-navy-light: var(--ds-color-navy-light);
+  --color-ds-background: var(--ds-color-background);
+  --color-ds-success: var(--ds-color-success);
+  --color-ds-success-bg: var(--ds-color-success-bg);
+  --color-ds-danger: var(--ds-color-danger);
+  --color-ds-danger-bg: var(--ds-color-danger-bg);
+
+  --radius-ds-sm: var(--ds-radius-sm);
+  --radius-ds-md: var(--ds-radius-md);
+  --radius-ds-pill: var(--ds-radius-pill);
+
+  --spacing-ds-xs: var(--ds-space-xs);
+  --spacing-ds-sm: var(--ds-space-sm);
+  --spacing-ds-md: var(--ds-space-md);
+  --spacing-ds-lg: var(--ds-space-lg);
+
+  --font-sans: var(--ds-font-sans);
+}

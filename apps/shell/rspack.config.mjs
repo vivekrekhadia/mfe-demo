@@ -1,8 +1,34 @@
 import { rspack } from "@rspack/core";
+import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
+
+// Pinned explicitly (not left to Module Federation's implicit version
+// inference) so a mismatch between what the Shell was built against and
+// what's actually loaded at runtime fails loudly (strictVersion below)
+// instead of silently sharing whichever @mfe/design-system version an
+// independently-released remote happened to load first.
+const { version: designSystemVersion } = require("@mfe/design-system/package.json");
+
+// Dev-only manifest override. Reads apps/shell/.env.local (gitignored, see
+// .env.local.example) if present. ship:build never has this file, so a
+// production build always gets MFE_MANIFEST_URL = "" and falls back to the
+// real Ship Server manifest path — see resolveManifestUrl() in
+// src/manifest/fetchManifest.ts.
+function readLocalManifestUrl() {
+  const envPath = path.resolve(__dirname, ".env.local");
+  if (!fs.existsSync(envPath)) return "";
+  const line = fs
+    .readFileSync(envPath, "utf-8")
+    .split("\n")
+    .map((l) => l.trim())
+    .find((l) => l.startsWith("MFE_MANIFEST_URL="));
+  return line ? line.slice("MFE_MANIFEST_URL=".length).trim() : "";
+}
 
 // --- The core of "runtime composition" ---
 //
@@ -79,6 +105,9 @@ export default {
     ],
   },
   plugins: [
+    new rspack.DefinePlugin({
+      MFE_MANIFEST_URL: JSON.stringify(readLocalManifestUrl()),
+    }),
     new rspack.container.ModuleFederationPlugin({
       name: "shell",
       remotes: {
@@ -89,7 +118,11 @@ export default {
       shared: {
         react: { singleton: true },
         "react-dom": { singleton: true },
-        "@mfe/design-system": { singleton: true },
+        "@mfe/design-system": {
+          singleton: true,
+          requiredVersion: designSystemVersion,
+          strictVersion: true,
+        },
       },
     }),
     new rspack.HtmlRspackPlugin({ template: "./index.html" }),
@@ -97,5 +130,9 @@ export default {
   devServer: {
     port: 5000,
     historyApiFallback: true,
+    // Serves apps/shell/public/manifest.local.json (gitignored — copy from
+    // manifest.local.json.example) at http://localhost:5000/manifest.local.json
+    // for the full-local-federation dev mode described in .env.local.example.
+    static: { directory: path.resolve(__dirname, "public") },
   },
 };
