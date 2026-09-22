@@ -1,4 +1,5 @@
 /*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@layer properties;
 @layer theme {
   :root, :host {
     --sh-color-white: #fff;
@@ -29,6 +30,9 @@
   .sh\:animate-pulse {
     animation: var(--sh-animate-pulse);
   }
+  .sh\:cursor-pointer {
+    cursor: pointer;
+  }
   .sh\:items-center {
     align-items: center;
   }
@@ -44,11 +48,18 @@
   .sh\:rounded-full {
     border-radius: calc(infinity * 1px);
   }
+  .sh\:border-0 {
+    border-style: var(--tw-border-style);
+    border-width: 0px;
+  }
   .sh\:bg-ds-accent {
     background-color: var(--sh-color-ds-accent);
   }
   .sh\:bg-ds-navy-light {
     background-color: var(--sh-color-ds-navy-light);
+  }
+  .sh\:bg-transparent {
+    background-color: transparent;
   }
   .sh\:px-3 {
     padding-inline: calc(var(--sh-spacing) * 3);
@@ -63,14 +74,35 @@
   .sh\:text-white {
     color: var(--sh-color-white);
   }
+  .sh\:text-white\/80 {
+    color: var(--sh-color-white);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--sh-color-white) 80%, transparent);
+    }
+  }
+  .sh\:underline {
+    text-decoration-line: underline;
+  }
   @media (width >= 40rem) {
     .sh\:sm\:inline-flex {
       display: inline-flex;
     }
   }
 }
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
 @keyframes pulse {
   50% {
     opacity: 0.5;
+  }
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-border-style: solid;
+    }
   }
 }

@@ -91,8 +91,8 @@ truth for what code runs, with no step anywhere that requires a cloud round-trip
 
 ### Module Federation + a runtime manifest (not build-time imports)
 
-The Shell's `rspack.config.mjs` declares three remotes by **name only**
-(`bookings`, `dining`, `payment`). It never contains a URL. Each remote is configured
+The Shell's `rspack.config.mjs` declares four remotes by **name only**
+(`bookings`, `dining`, `payment`, `signin`). It never contains a URL. Each remote is configured
 using Rspack/webpack's standard **dynamic remote** pattern: a `promise`-prefixed string
 that Rspack's Module Federation runtime executes as literal JS the moment the Shell first
 requests that remote's container — not at build time. That code reads
@@ -139,12 +139,15 @@ running webpack Module Federation, and dramatically faster to build than plain w
 ### Route-based MFEs: the URL is the source of truth for which remote is mounted
 
 `apps/shell/src/bootstrap.tsx` wraps the app in `<BrowserRouter>`, and
-`apps/shell/src/App.tsx` maps three top-level paths straight to the three remotes:
+`apps/shell/src/App.tsx` maps three top-level, business-domain paths straight to three of
+the four remotes (the fourth, `signin`, isn't a nav tab — `AuthGate` mounts it directly
+whenever there's no valid session; see "Authentication" above):
 
 ```
 /bookings  -> RemoteLoader(loader: importBookings)   (Route-based Micro Front Ends)
 /dining    -> RemoteLoader(loader: importDining)
 /payments  -> RemoteLoader(loader: importPayment)
+/signin    -> RemoteLoader(loader: importSignin)     (mounted by AuthGate, not a nav tab)
 /  and any unknown path -> redirect to /bookings
 ```
 
@@ -313,13 +316,25 @@ imported exactly once by the Shell — see "Why offline works" for why that stay
 is deliberately **not** prefixed: it generates zero utility classes of its own
 (`source(none)`), so there's nothing for a prefix to namespace, and prefixing it would
 work against the very thing every app's prefix exists to protect. The hand-authored CSS
-classes everything still shares (`.mfe-panel`, `.nav-tab`, `.ds-button`, …) aren't
-Tailwind-generated either, so they're untouched by any of this — same one global
-`styles.css`/`@mfe/design-system/styles.css`, same class names, on purpose.
+classes MFEs share this way (`.mfe-panel`, `.mfe-row`, `.mfe-tab`, `.ds-button`, `.ds-card`,
+…) aren't Tailwind-generated either, so they're untouched by any of this — same one
+`@mfe/design-system/styles.css`, same class names, on purpose.
 
 This is also what makes running one MFE standalone (`pnpm --filter @mfe/bookings-mfe
 dev`) safe to reason about in isolation: whatever utility classes render are provably
 *this app's own*, never a same-named class another app happened to define differently.
+
+**`apps/shell/src/styles.css` is a separate, third stylesheet — Shell-chrome only, never
+shared.** It holds classes like `.shell-header`, `.nav-tab`, `.release-bar`, and the
+loading/error states `RemoteLoader` wraps around a not-yet-loaded remote (`.mfe-slot-loading`,
+`.mfe-slot-error`, …) — things the Shell renders *around* an MFE, never inside one, so an
+MFE never has a reason to reference them (and, since a standalone MFE dev server never
+loads this file at all, doing so would silently break in standalone mode). This is a real
+project convention, not just incidental: **a new MFE's own styling comes from
+`@mfe/design-system` (shared) and/or that MFE's own prefixed Tailwind
+(`apps/<mfe>/src/tailwind-input.css`) — never from `apps/shell/src/styles.css`.** If a new
+MFE needs a look Shell already has and design-system doesn't, that look belongs promoted
+into `@mfe/design-system`, not imported from Shell.
 
 ### Sharing Shell state with an MFE (a version-pinned Context, not props)
 
@@ -361,23 +376,50 @@ better default for most Shell → MFE data. Context is worth the extra setup spe
 when state also needs to flow MFE → Shell, or Shell → many independently-loaded MFEs at
 once, without every intermediate layer having to know about it.
 
-### Why authentication is explicitly out of scope here
+### Authentication
 
 **Module Federation being offline does not automatically make authentication offline.**
 If this system's real login flow depended on a cloud OIDC provider, the app could still
 fail to let anyone in while the ship has no uplink — MFE delivery and session/identity
-are separate architectural concerns. This POC only proves the MFE-delivery half. It
-includes one deliberately trivial mock: the Ship Server exposes `GET /api/session`
-returning a hard-coded user, and the Shell displays it in the header — just enough to
-demonstrate that *some* session state can be served locally with no cloud round-trip. A
-real implementation would need a ship-local identity provider:
+are separate architectural concerns. This POC proves both are possible entirely
+ship-local, with a deliberately simple (not production-grade) implementation:
 
-```
-Ship Browser -> Ship-local Identity Provider -> Local Session
-```
+- **`apps/signin-mfe`** owns the sign-in UI, form validation, and session creation —
+  following the standard MFE division of responsibility: the sign-in MFE owns the
+  form/flows/session creation, the Shell only checks token validity on load and redirects
+  (see `AuthGate` in `apps/shell/src/App.tsx`). It's a Module Federation remote with full
+  parity to `bookings-mfe`/`dining-mfe`/`payment-mfe` — its own build, its own entry in
+  the release manifest, deployed/versioned the same way.
+- **`apps/ship-server`** owns session issuance: `POST /api/auth/login` accepts any
+  non-empty username/password (`apps/ship-server/lib/auth.mjs`) — there is deliberately
+  **no credential check and no user store** here, since this POC's point is proving the
+  MFE-delivery/token-enforcement architecture works, not standing up a real identity
+  system. Whatever username is entered becomes the signed-in user everywhere in the UI.
+  What's real: the session itself. Login issues an opaque, server-generated token as an
+  httpOnly cookie, held only in an in-memory `Map` on the Ship Server, and every
+  protected request — `GET /api/session`, `POST /api/auth/logout`, the Bookings tab's
+  "crew log" demo (`GET /api/crew-log`) — genuinely requires a valid one; a request
+  without it gets a real 401, not a decorative one. See `apps/bookings-mfe/src/CrewLogDemo.tsx`
+  for the two buttons that prove this by calling the same endpoint with and without it.
 
-with its own sync/provisioning story (e.g. accounts synced down at the last port), which
-is a separate project from this one.
+This is still **not** a real identity system, deliberately:
+
+- No credential check at all, by design (see above) — this is a demo of the
+  MFE/token-delivery architecture, not an access-control system.
+- Sessions live in an in-memory `Map` on the Ship Server — a server restart signs
+  everyone out. A real implementation would persist sessions (or reissue them
+  cheaply on reconnect).
+- No rate-limiting, and no CSRF protection beyond `SameSite=Lax` — acceptable for a
+  local single-user demo, not for a multi-user production system.
+- No real ship-local identity provider or multi-user provisioning/sync story (e.g.
+  accounts synced down at the last port):
+
+  ```
+  Ship Browser -> Ship-local Identity Provider -> Local Session
+  ```
+
+  A real one — with an actual credential check — is a separate project from this one;
+  `apps/ship-server/lib/auth.mjs` only proves the session/token half.
 
 ## 4. Project structure
 
@@ -388,7 +430,8 @@ offline-mfe-poc/
 │   ├── bookings-mfe/     # Remote: exposes ./BookingsApp (owns its own /:cabinSlug sub-route)
 │   ├── dining-mfe/       # Remote: exposes ./DiningApp
 │   ├── payment-mfe/      # Remote: exposes ./PaymentApp
-│   └── ship-server/      # Express server: serves Shell, MFE releases, manifest, mock API
+│   ├── signin-mfe/       # Remote: exposes ./SignInApp (owns the sign-in form/flow)
+│   └── ship-server/      # Express server: serves Shell, MFE releases, manifest, local auth API
 ├── packages/
 │   ├── shared-types/     # MfeManifest contract + isMfeManifest() runtime validator
 │   ├── shared-config/    # MANIFEST_PATH, ports — structural constants, not URLs
@@ -417,11 +460,12 @@ pnpm install                       # install all workspace packages
 pnpm --filter @mfe/shell dev       # iterate on the Shell alone (Rspack dev server, :5000)
 pnpm --filter @mfe/bookings-mfe dev  # iterate on one MFE in isolation (:5001), renders
                                       # standalone via src/bootstrap.tsx — not through federation
+pnpm --filter @mfe/signin-mfe dev    # iterate on the sign-in form in isolation (:5004)
 
-pnpm build                         # production build: shell + all 3 MFEs
+pnpm build                         # production build: shell + all 4 MFEs
 pnpm test                          # vitest — manifest schema, release validation,
-                                      # rollback history, Shell manifest/remote-load logic
-pnpm typecheck                     # strict tsc --noEmit for shell + all 3 MFEs
+                                      # rollback history, Shell manifest/remote-load/session logic
+pnpm typecheck                     # strict tsc --noEmit for shell + all 4 MFEs
 ```
 
 Federated Module Federation loading only really "happens" once real, built
@@ -513,13 +557,14 @@ between the two release builds.
 
 The Ship Server is the *only* thing the Shell or any MFE ever talks to. To prove that:
 
-1. `pnpm ship:server`, open `http://localhost:4173`, confirm all three routes
-   (`/bookings`, `/dining`, `/payments`) load.
+1. `pnpm ship:server`, open `http://localhost:4173`, sign in with any username/password
+   (see "Authentication" above), then confirm all three business routes (`/bookings`,
+   `/dining`, `/payments`) load.
 2. Disconnect the machine from the internet (turn off Wi-Fi, unplug ethernet, or use your
    OS's airplane mode) — leave the Ship Server itself running, since *it* is the ship's
    local network, not the internet.
-3. Refresh the browser. Everything still loads: Shell, all three MFEs, the release
-   banner, the mock session badge.
+3. Refresh the browser. Everything still loads: Shell, all four MFEs (including signing
+   back in from a fresh session), the release banner, the session badge.
 
 If you want to prove it at the network level instead of trusting your OS's airplane
 mode, block everything except localhost with a firewall rule for the duration of the
@@ -577,7 +622,9 @@ everywhere):
   `ship:deploy`, not versioned per-release) — this is intentional (Constraint 10), not a
   gap, but it does mean a Shell-breaking change needs its own release/rollback story,
   which this POC doesn't model.
-- **No real identity/session system** — see "Authentication" above.
+- **No real identity provider or multi-user provisioning story** — see "Authentication"
+  above; sessions are also in-memory (lost on Ship Server restart) and there's no
+  rate-limiting/CSRF hardening.
 - **Single ship-server process, no HA** — a real ship would run this behind a supervisor
   that restarts it if it crashes; out of scope here.
 
@@ -765,8 +812,9 @@ Known limitations
 Retry re-runs the same dynamic import (works for real network blips, not a substitute
 for a page reload after very unusual failures). Checksums prove integrity, not
 authenticity — no release signing. Shell is deployed/overwritten independently of MFE
-releases by design, with no versioned rollback story of its own. Authentication is an
-explicitly separate, unsolved concern here (one mocked local session endpoint only).
+releases by design, with no versioned rollback story of its own. Authentication is a real
+but deliberately simple ship-local login (see "Authentication" above) — no real identity
+provider, in-memory sessions, no rate-limiting/CSRF hardening.
 Single ship-server process with no process supervisor/HA story. Governance (who may
 run ship:activate against a real ship) is a process decision this repo enables but
 cannot enforce by itself — see section 12, item 7.

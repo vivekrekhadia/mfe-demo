@@ -5,7 +5,7 @@
  * three evolve independently.
  */
 
-export const MFE_NAMES = ["bookings", "dining", "payment"] as const;
+export const MFE_NAMES = ["bookings", "dining", "payment", "signin"] as const;
 
 export type MfeName = (typeof MFE_NAMES)[number];
 

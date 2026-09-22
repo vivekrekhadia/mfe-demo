@@ -175,10 +175,14 @@
    (`pnpm --filter @mfe/bookings-mfe dev`) renders fully styled, not just
    Preflight-reset plain text — no Shell required for that.
 
-   The Shell's OWN chrome (header, nav, release bar, the .mfe-slot-loading
-   / .mfe-slot-error remote-load states) stays in apps/shell/src/styles.css
-   — those are things the Shell renders AROUND an MFE, never inside one,
-   and standalone mode has nothing to load in the first place. */
+   The Shell's OWN chrome (header, nav, release bar, the .mfe-slot-error
+   "a remote/the manifest failed to load" state) stays in
+   apps/shell/src/styles.css — those are things the Shell renders AROUND
+   an MFE, never inside one. .mfe-slot-loading/.mfe-skeleton-line below are
+   different: any MFE's own in-page async work can be mid-flight too (a
+   button-triggered fetch, not just "the remote itself hasn't loaded yet"),
+   so that loading look is shared here instead — see
+   apps/bookings-mfe/src/CrewLogDemo.tsx for an MFE using it directly. */
 
 :root {
   color-scheme: light;
@@ -221,6 +225,35 @@ button {
   box-shadow: var(--ds-shadow-md);
   min-height: 140px;
   box-sizing: border-box;
+}
+
+/* Two shapes this gets used in: wrapping a whole not-yet-loaded remote
+   inside .mfe-slot (see apps/shell/src/federation/RemoteLoader.tsx), or
+   standing alone inline wherever a component's own async work is
+   mid-flight (no .mfe-slot wrapper needed there — it's not a "not loaded
+   yet" placeholder for a whole screen, just a few lines where data will
+   appear). */
+.mfe-slot-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mfe-skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef2f6 25%, #e3e9f0 37%, #eef2f6 63%);
+  background-size: 400% 100%;
+  animation: mfe-shimmer 1.4s ease infinite;
+}
+
+@keyframes mfe-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 /* Explicit here because Tailwind's Preflight resets h1-h6 to

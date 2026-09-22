@@ -7,7 +7,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "pnpm --filter ./apps/shell --filter ./apps/bookings-mfe --filter ./apps/dining-mfe --filter ./apps/payment-mfe run build",
+    "build": "pnpm --filter ./apps/shell --filter ./apps/bookings-mfe --filter ./apps/dining-mfe --filter ./apps/payment-mfe --filter ./apps/signin-mfe run build",
     "build:static": "node scripts/build-static-demo.mjs",
     "ship:server": "pnpm --filter ship-server run start",
     "ship:server:dev": "pnpm --filter ship-server run dev",
@@ -21,7 +21,7 @@
     "ship:break": "node scripts/break-release.mjs",
     "seed": "node scripts/seed-releases.mjs",
     "test": "vitest run",
-    "typecheck": "bash -c 'for d in apps/shell apps/bookings-mfe apps/dining-mfe apps/payment-mfe; do echo \"> $d\"; tsc --noEmit -p $d/tsconfig.json || exit 1; done'"
+    "typecheck": "bash -c 'for d in apps/shell apps/bookings-mfe apps/dining-mfe apps/payment-mfe apps/signin-mfe; do echo \"> $d\"; tsc --noEmit -p $d/tsconfig.json || exit 1; done'"
   },
   "devDependencies": {
     "typescript": "^5.6.2",

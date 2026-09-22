@@ -3,15 +3,17 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import { validateReleaseDir, recordActivation } from "./manifest.mjs";
+import { MFE_NAMES } from "./paths.mjs";
 
+// Derived from MFE_NAMES (not hardcoded) so this fixture can't silently
+// drift out of sync with validateReleaseDir, which loops over the same
+// list — see scripts/deploy-ship.mjs for a case where a hardcoded copy did.
 function writeManifest(dir, release) {
   const manifest = {
     release,
-    mfes: {
-      bookings: { version: "1.0.0", url: `/mfe/releases/${release}/bookings/remoteEntry.js` },
-      dining: { version: "1.0.0", url: `/mfe/releases/${release}/dining/remoteEntry.js` },
-      payment: { version: "1.0.0", url: `/mfe/releases/${release}/payment/remoteEntry.js` },
-    },
+    mfes: Object.fromEntries(
+      MFE_NAMES.map((mfe) => [mfe, { version: "1.0.0", url: `/mfe/releases/${release}/${mfe}/remoteEntry.js` }]),
+    ),
   };
   fs.writeFileSync(path.join(dir, "manifest.json"), JSON.stringify(manifest, null, 2));
 }
@@ -19,7 +21,7 @@ function writeManifest(dir, release) {
 function makeCompleteRelease(dir, release) {
   fs.mkdirSync(path.join(dir, "shell"), { recursive: true });
   fs.writeFileSync(path.join(dir, "shell", "index.html"), "<html></html>");
-  for (const mfe of ["bookings", "dining", "payment"]) {
+  for (const mfe of MFE_NAMES) {
     fs.mkdirSync(path.join(dir, mfe), { recursive: true });
     fs.writeFileSync(path.join(dir, mfe, "remoteEntry.js"), "export default {};");
   }

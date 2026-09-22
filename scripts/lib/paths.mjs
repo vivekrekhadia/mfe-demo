@@ -29,6 +29,7 @@ export const APPS = {
   bookings: path.join(ROOT, "apps", "bookings-mfe"),
   dining: path.join(ROOT, "apps", "dining-mfe"),
   payment: path.join(ROOT, "apps", "payment-mfe"),
+  signin: path.join(ROOT, "apps", "signin-mfe"),
 };
 
-export const MFE_NAMES = ["bookings", "dining", "payment"];
+export const MFE_NAMES = ["bookings", "dining", "payment", "signin"];

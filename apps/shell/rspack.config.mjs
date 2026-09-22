@@ -120,6 +120,7 @@ export default {
         bookings: dynamicRemote("bookings"),
         dining: dynamicRemote("dining"),
         payment: dynamicRemote("payment"),
+        signin: dynamicRemote("signin"),
       },
       shared: {
         react: { singleton: true },

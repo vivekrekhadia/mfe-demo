@@ -1,0 +1,30 @@
+/* Source for the generated ./tailwind.css — run `pnpm run build:css` (or
+   just `pnpm run build`, which runs this first) after adding new Tailwind
+   classes in this MFE's source to regenerate it.
+
+   No Preflight import here on purpose: this MFE is loaded into the Shell's
+   page via Module Federation, and the Shell already owns the one global
+   Preflight reset (see apps/shell/src/bootstrap.tsx importing
+   @mfe/design-system/tailwind.css). A second Preflight here would just be
+   a redundant, independently-versioned copy of the same global reset —
+   exactly the cross-MFE collision risk this setup is meant to avoid.
+
+   Pulls in the shared theme (ds-navy, ds-space-*, etc.) from
+   @mfe/design-system so utility classes built from it (bg-ds-navy, ...)
+   resolve to the same values as everywhere else, without duplicating
+   Preflight or re-declaring the theme's :root variables in this file's
+   own output. source(".") scopes the JIT content scan to this file's own
+   directory (./src) — without it, automatic detection scans from the
+   working directory the CLI was invoked in and picks up node_modules.
+
+   prefix(si) namespaces every class this app generates (si:flex, not
+   flex) and every theme variable (--si-color-ds-navy, not --color-ds-navy)
+   to Sign-In alone, so its compiled CSS can never collide with another
+   independently-built MFE's — see apps/shell/src/tailwind-input.css for
+   the full rationale and the "must be on every Tailwind import, verified
+   directly" caveat. Source (SignInApp.tsx etc.) must write the prefixed
+   class names directly (className="si:flex si:gap-2") — Tailwind does not
+   add the prefix for you. */
+@import "tailwindcss/theme" layer(theme) prefix(si);
+@import "@mfe/design-system/tailwind-theme.css" layer(theme) prefix(si);
+@import "tailwindcss/utilities" layer(utilities) prefix(si) source(".");

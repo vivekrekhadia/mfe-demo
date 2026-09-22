@@ -5,6 +5,7 @@ const OWNERS = [
   { prefix: "/bookings", mfe: "Bookings", remote: "bookings/BookingsApp" },
   { prefix: "/dining", mfe: "Dining", remote: "dining/DiningApp" },
   { prefix: "/payments", mfe: "Payment", remote: "payment/PaymentApp" },
+  { prefix: "/signin", mfe: "Sign-In", remote: "signin/SignInApp" },
 ] as const;
 
 /**

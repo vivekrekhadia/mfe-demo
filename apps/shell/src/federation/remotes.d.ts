@@ -18,3 +18,7 @@ declare module "payment/PaymentApp" {
   const PaymentApp: import("react").ComponentType;
   export default PaymentApp;
 }
+declare module "signin/SignInApp" {
+  const SignInApp: import("react").ComponentType;
+  export default SignInApp;
+}

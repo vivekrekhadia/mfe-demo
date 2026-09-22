@@ -1,24 +1,90 @@
 /*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@layer properties;
 @layer theme {
   :root, :host {
     --bk-spacing: 0.25rem;
+    --bk-text-sm: 0.875rem;
+    --bk-text-sm--line-height: calc(1.25 / 0.875);
+    --bk-radius-md: 0.375rem;
+    --bk-color-ds-danger: var(--ds-color-danger);
+    --bk-color-ds-danger-bg: var(--ds-color-danger-bg);
+    --bk-radius-ds-md: var(--ds-radius-md);
   }
 }
 @layer theme;
 @layer utilities {
+  .bk\:mt-0\.5 {
+    margin-top: calc(var(--bk-spacing) * 0.5);
+  }
   .bk\:mt-1 {
     margin-top: var(--bk-spacing);
   }
   .bk\:mt-2 {
     margin-top: calc(var(--bk-spacing) * 2);
   }
+  .bk\:mt-3 {
+    margin-top: calc(var(--bk-spacing) * 3);
+  }
   .bk\:flex {
     display: flex;
+  }
+  .bk\:shrink-0 {
+    flex-shrink: 0;
+  }
+  .bk\:flex-col {
+    flex-direction: column;
   }
   .bk\:items-center {
     align-items: center;
   }
+  .bk\:items-start {
+    align-items: flex-start;
+  }
+  .bk\:gap-1 {
+    gap: var(--bk-spacing);
+  }
   .bk\:gap-2 {
     gap: calc(var(--bk-spacing) * 2);
+  }
+  .bk\:rounded-ds-md {
+    border-radius: var(--bk-radius-ds-md);
+  }
+  .bk\:border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
+  .bk\:border-ds-danger\/25 {
+    border-color: var(--bk-color-ds-danger);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--bk-color-ds-danger) 25%, transparent);
+    }
+  }
+  .bk\:bg-ds-danger-bg {
+    background-color: var(--bk-color-ds-danger-bg);
+  }
+  .bk\:px-3 {
+    padding-inline: calc(var(--bk-spacing) * 3);
+  }
+  .bk\:py-2\.5 {
+    padding-block: calc(var(--bk-spacing) * 2.5);
+  }
+  .bk\:text-sm {
+    font-size: var(--bk-text-sm);
+    line-height: var(--tw-leading, var(--bk-text-sm--line-height));
+  }
+  .bk\:text-ds-danger {
+    color: var(--bk-color-ds-danger);
+  }
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-border-style: solid;
+    }
   }
 }

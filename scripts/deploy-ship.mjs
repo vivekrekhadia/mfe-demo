@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import { STAGING_DIR, SHIP_RELEASES_DIR, SHIP_SHELL_DIR } from "./lib/paths.mjs";
+import { STAGING_DIR, SHIP_RELEASES_DIR, SHIP_SHELL_DIR, MFE_NAMES } from "./lib/paths.mjs";
 import { validateReleaseDir, printChecklist } from "./lib/manifest.mjs";
 import { exists } from "./lib/fsutil.mjs";
 
@@ -44,7 +44,7 @@ if (exists(destDir)) {
 }
 
 fs.mkdirSync(destDir, { recursive: true });
-for (const mfe of ["bookings", "dining", "payment"]) {
+for (const mfe of MFE_NAMES) {
   fs.cpSync(path.join(stagingDir, mfe), path.join(destDir, mfe), { recursive: true });
 }
 fs.cpSync(path.join(stagingDir, "manifest.json"), path.join(destDir, "manifest.json"));

@@ -9,6 +9,7 @@ const validManifest = {
     bookings: { version: "1.0.0", url: "/mfe/releases/2026.09.01/bookings/remoteEntry.js" },
     dining: { version: "1.0.0", url: "/mfe/releases/2026.09.01/dining/remoteEntry.js" },
     payment: { version: "1.0.0", url: "/mfe/releases/2026.09.01/payment/remoteEntry.js" },
+    signin: { version: "1.0.0", url: "/mfe/releases/2026.09.01/signin/remoteEntry.js" },
   },
 };
 

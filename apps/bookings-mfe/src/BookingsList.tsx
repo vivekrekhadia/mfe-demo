@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useShellState } from "@mfe/shared-state";
 import { Badge, Button, HelperNote } from "@mfe/design-system";
 import { bookings } from "./bookings";
+import { CrewLogDemo } from "./CrewLogDemo";
 
 /**
  * Default view for "/bookings" (the index sub-route). "View Booking" is a
@@ -62,6 +63,8 @@ export function BookingsList() {
           down from the Shell; this MFE is writing directly into state the Shell owns.
         </HelperNote>
       )}
+
+      <CrewLogDemo />
     </section>
   );
 }

@@ -27,7 +27,7 @@ if (exists(releaseStagingDir)) {
 
 console.log(`Building release ${release}...\n`);
 
-for (const appDir of [APPS.shell, APPS.bookings, APPS.dining, APPS.payment]) {
+for (const appDir of [APPS.shell, APPS.bookings, APPS.dining, APPS.payment, APPS.signin]) {
   const pkg = readJson(path.join(appDir, "package.json"));
   console.log(`> building ${pkg.name}@${pkg.version}`);
   execFileSync("pnpm", ["--filter", pkg.name, "run", "build"], {

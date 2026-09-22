@@ -10,3 +10,4 @@ type RemoteModule = { default: ComponentType };
 export const importBookings = (): Promise<RemoteModule> => import("bookings/BookingsApp");
 export const importDining = (): Promise<RemoteModule> => import("dining/DiningApp");
 export const importPayment = (): Promise<RemoteModule> => import("payment/PaymentApp");
+export const importSignin = (): Promise<RemoteModule> => import("signin/SignInApp");

@@ -3,12 +3,168 @@
    @mfe/design-system/styles.css instead — see that file's header comment
    for why. This file only has the Shell's OWN chrome: things the Shell
    renders AROUND an MFE (header, nav, release bar, the loading/error
-   states around a not-yet-loaded remote), never inside one. */
+   states around a not-yet-loaded remote), never inside one.
+
+   RULE: nothing in this file is ever a dependency of MFE-owned content.
+   No MFE component should reference a class defined here — a standalone
+   MFE dev server (`pnpm --filter @mfe/<name> dev`) never loads this file,
+   so doing so would render correctly in the Shell and silently break
+   standalone. A new MFE's own look comes from @mfe/design-system (shared)
+   or that MFE's own prefixed Tailwind — see README "Per-app Tailwind
+   prefixes" — never from here. */
 
 .shell-app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* The one moment before AuthGate (App.tsx) knows whether the visitor is
+   authenticated — see FullPageLoader's own comment for why this is
+   deliberately neutral rather than either the signed-in chrome or the
+   sign-in branding. */
+.shell-boot-loader {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ds-color-background);
+}
+
+.shell-boot-loader-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-color-navy);
+  color: var(--ds-color-accent);
+  animation: shell-boot-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes shell-boot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+}
+
+/* Deliberately NOT .shell-app: unauthenticated users see no header, no
+   nav, no SessionBadge — all of those imply access to routes that aren't
+   reachable yet (see AuthGate in App.tsx and SigninLayout below).
+   Two-panel layout (branded side + form side) rather than a plain centered
+   card on an empty background: a narrow card centered in a full-width
+   viewport with nothing else on the page reads as unfinished/empty on any
+   screen wider than the card itself. Splitting the width on purpose (each
+   side gets real content) is also more robust than trying to "fill" empty
+   space with a decorative background — a viewport-relative background
+   (e.g. a radial-gradient sized off the viewport) looks fine at one
+   viewport size and produces harsh edges or a misplaced glow at another;
+   this layout doesn't depend on the viewport's exact dimensions at all. */
+.shell-signin-layout {
+  min-height: 100vh;
+  display: flex;
+  box-sizing: border-box;
+}
+
+/* Hidden below 860px (see media query at the bottom of this file): on a
+   narrow/mobile viewport there isn't room for two panels, and the form
+   itself is the only thing that matters there anyway. */
+.shell-signin-brand {
+  display: none;
+  flex: 1 1 44%;
+  background: linear-gradient(160deg, var(--ds-color-navy) 0%, var(--ds-color-navy-light) 100%);
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  box-sizing: border-box;
+}
+
+.shell-signin-brand-inner {
+  max-width: 360px;
+}
+
+.shell-signin-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--ds-radius-md);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--ds-color-accent);
+  margin-bottom: 20px;
+}
+
+.shell-signin-brand-title {
+  margin: 0 0 10px;
+  font-size: 26px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.2px;
+}
+
+.shell-signin-brand-tagline {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.shell-signin-form-panel {
+  flex: 1 1 56%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px 24px;
+  box-sizing: border-box;
+  background: var(--ds-color-background);
+}
+
+/* Without this, RemoteLoader's .mfe-slot (a flex item under align-items:
+   center above) has no width of its own to stretch into — it shrink-wraps
+   around its content instead. That content (SignInApp's own `si:w-full`
+   div) then has a `width: 100%` that can't resolve against an "auto"
+   containing block, which — per the CSS spec's handling of that exact
+   circular case — computes as if it were `width: auto` too, cascading all
+   the way down to each `<input>` falling back to the browser's native
+   ~20-character default width. Net effect: SignInApp's own `max-w-md`
+   (apps/signin-mfe/src/SignInApp.tsx) was legally satisfied by a ~213px
+   box and never got the chance to matter. Giving .mfe-slot an explicit,
+   non-percentage-chained width here (100% of .shell-signin-form-panel's
+   own concrete flex-basis width, capped at 28rem) breaks that chain at
+   its source — confirmed via getBoundingClientRect(), not just visually. */
+.shell-signin-form-panel .mfe-slot {
+  width: 100%;
+  max-width: 28rem;
+}
+
+/* Same fix, same reason, applied to RouteOwnershipBanner's <HelperNote>
+   (.ds-helper-note has no width of its own either — it's a flex item here
+   too, so without this it shrink-wraps to its one-line text content and
+   ends up wider than the card instead of matching it). Kept as a literal
+   duplicate of the 28rem value above rather than a shared variable: these
+   are two different elements that happen to agree on a width by design
+   (the note should visually align with the card it's describing), not two
+   places deriving from one shared constraint. */
+.shell-signin-form-panel .ds-helper-note {
+  width: 100%;
+  max-width: 28rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 860px) {
+  .shell-signin-brand {
+    display: flex;
+  }
 }
 
 .shell-header {
@@ -143,33 +299,17 @@
   box-sizing: border-box;
 }
 
-/* .mfe-slot itself (the card look) lives in @mfe/design-system/styles.css
-   — these are just the two state-specific modifiers layered on top of it
-   while a remote is loading or failed to load, which only ever happens
-   here in the Shell (a standalone MFE has nothing to "load"). */
-.mfe-slot-loading {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.mfe-skeleton-line {
-  height: 14px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #eef2f6 25%, #e3e9f0 37%, #eef2f6 63%);
-  background-size: 400% 100%;
-  animation: mfe-shimmer 1.4s ease infinite;
-}
-
-@keyframes mfe-shimmer {
-  0% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0 50%;
-  }
-}
-
+/* .mfe-slot itself (the card look), .mfe-slot-loading and .mfe-skeleton-line
+   all live in @mfe/design-system/styles.css now — moved there (not kept
+   Shell-only like .mfe-slot-error below) specifically so an MFE's own
+   in-page async work (e.g. CrewLogDemo's fetch — see
+   apps/bookings-mfe/src/CrewLogDemo.tsx) can show the exact same skeleton
+   look the Shell uses while a remote is loading, instead of every MFE
+   hand-rolling its own loading indicator. .mfe-slot-error stays here,
+   Shell-only: it specifically means "a remote/the manifest failed to
+   load", which is a Shell-level concern an MFE's own component never
+   needs to represent (an MFE has its own error banner pattern instead —
+   see CrewLogDemo's "no session cookie" banner). */
 .mfe-slot-error {
   border-color: #f0c6c6;
   background: var(--ds-color-danger-bg);
