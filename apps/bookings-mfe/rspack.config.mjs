@@ -12,6 +12,10 @@ const require = createRequire(import.meta.url);
 // instead of silently sharing whichever @mfe/design-system version another
 // independently-released remote happened to load first.
 const { version: designSystemVersion } = require("@mfe/design-system/package.json");
+// See apps/shell/rspack.config.mjs for why @mfe/shared-state must be a
+// version-pinned singleton (it exports a React Context, whose identity
+// must match the Shell's Provider exactly).
+const { version: sharedStateVersion } = require("@mfe/shared-state/package.json");
 
 // publicPath: "auto" is what makes this remote's chunks resolve correctly
 // no matter which release folder remoteEntry.js is eventually served from
@@ -58,9 +62,18 @@ export default {
       shared: {
         react: { singleton: true },
         "react-dom": { singleton: true },
+        // Singleton so this MFE's own <Routes> (its sub-routes) shares the
+        // Shell's <BrowserRouter> instance rather than mounting a second,
+        // disconnected router.
+        "react-router-dom": { singleton: true },
         "@mfe/design-system": {
           singleton: true,
           requiredVersion: designSystemVersion,
+          strictVersion: true,
+        },
+        "@mfe/shared-state": {
+          singleton: true,
+          requiredVersion: sharedStateVersion,
           strictVersion: true,
         },
       },

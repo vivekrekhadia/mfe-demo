@@ -163,6 +163,48 @@ React and runtime Module Federation. Concretely, that means:
 - Clicking a nav link is a client-side (`pushState`) navigation, not a full page
   reload — verified directly against a real browser (see "Verification performed").
 
+### An MFE can own its own sub-routes — several levels deep
+
+The Shell maps each MFE to a wildcard, `/bookings/*`, `/dining/*`, `/payments/*` — not a
+plain `/bookings` — and the trailing `/*` is what lets each MFE mount its own nested
+`<Routes>` and own URLs underneath its one top-level path, without the Shell ever needing
+to know they exist. All three MFEs follow the same three-levels-deep shape (list -> detail
+layout with its own sub-nav -> a nested sub-list -> a sub-detail, i.e. a child of a
+child):
+
+```
+/bookings                            Bookings' index route (the booking list)
+/bookings/1204                       Bookings' ":cabinSlug" route (Overview / Itinerary / Guests tabs)
+/bookings/1204/itinerary             a sibling tab of the same layout
+/bookings/1204/guests                a sibling tab that is ITSELF a layout (GuestsLayout)
+/bookings/1204/guests/g1             a child of that layout — level 3
+
+/dining/ocean                        Dining's ":restaurantSlug" route (Menu / Reviews tabs)
+/dining/ocean/reviews/r1             same shape — ReviewsLayout -> ReviewDetail, level 3
+
+/payments/inv-001                    Payment's ":invoiceId" route (Summary / Line Items tabs)
+/payments/inv-001/items/li-2         same shape — LineItemsLayout -> LineItemDetail, level 3
+```
+
+See `apps/bookings-mfe/src/BookingsApp.tsx` (and the equivalent `DiningApp.tsx` /
+`PaymentApp.tsx`) for the full nested `<Route>` trees, and e.g. `GuestsLayout.tsx` for
+what a route that exists purely to be a parent — no UI of its own beyond an `<Outlet />`
+— looks like. Each detail layout resolves its record once (`findBookingBySlug`,
+`findRestaurantBySlug`, `findInvoiceById`) and passes it down through nested `<Outlet
+context={...}>` / `useOutletContext()`, so a level-3 leaf like `GuestDetail` never
+re-fetches or re-parses the URL param its parent already resolved.
+
+This works because `react-router-dom` is a Module Federation `singleton` (see below) in
+both the Shell and every MFE: an MFE's nested `<Routes>` resolves against the exact same
+router instance the Shell's one `<BrowserRouter>` created, so `<Link>`, `useNavigate`, and
+`useParams` inside the MFE behave exactly as they would in a single, non-federated app —
+browser back/forward and a hard refresh on `/bookings/1204/guests/g1` both work, for the
+same catch-all-serves-`index.html` reason a top-level route like `/dining` does. The
+Shell's own route config still only ever says `"/bookings/*"`: adding, removing, or
+renaming an MFE's internal screens — at any depth — is a change entirely inside that
+MFE's own app, requiring no Shell change or redeploy — the same independent-release story
+the manifest already gives each MFE, just carried one (or more) levels deeper.
+
 ### Why releases are immutable
 
 `pnpm ship:deploy <release>` refuses to run if `mfe/releases/<release>/` already exists
@@ -226,6 +268,99 @@ the `singleton`/`strictVersion` settings) — which is exactly the kind of thing
 validation and a staged rollout (activate on ship, watch it, roll back if wrong) exists
 to catch before it reaches every passenger.
 
+### Per-app Tailwind prefixes
+
+Every app compiles its own Tailwind CSS independently (`apps/*/src/tailwind-input.css`
+→ `tailwind.css`, built via each app's own `build:css` script) and bundles it into its
+own federated JS module — there's no single "app-wide" stylesheet. Each app's compiled
+utilities are namespaced with a Tailwind v4 `prefix()`: the Shell uses `sh:`, Bookings
+`bk:`, Dining `dn:`, Payment `pm:` — so `className="flex items-center"` in the Shell is
+`className="sh:flex sh:items-center"`, and the exact same pattern in Bookings is
+`"bk:flex bk:items-center"`.
+
+```css
+/* apps/bookings-mfe/src/tailwind-input.css */
+@import "tailwindcss/theme" layer(theme) prefix(bk);
+@import "@mfe/design-system/tailwind-theme.css" layer(theme) prefix(bk);
+@import "tailwindcss/utilities" layer(utilities) prefix(bk) source(".");
+```
+
+Without this, every app's compiled CSS would define the *same* selector names
+(`.flex`, `.gap-2`, `.rounded-ds-pill`, …) from the *same* shared theme — harmless today
+because every app currently builds against the same Tailwind/theme version, but not a
+guarantee that holds as each MFE is released independently over time (that's the whole
+point of this repo — see "Independent MFE deployment" below). A newer or older Tailwind
+on one MFE could one day generate a same-named class with different computed CSS, and
+whichever bundle's `<style>` happened to load last would silently win on every page that
+mounts more than one app — a real, hard-to-diagnose cross-MFE bug class in production
+Module Federation setups. Prefixing makes that structurally impossible: `.bk\:flex` and
+`.dn\:flex` cannot collide no matter how far their definitions drift.
+
+Two things worth knowing if you touch this:
+
+- **`prefix()` must be on every Tailwind-owned `@import` in a file** (both the `theme`
+  and `utilities` imports, and the shared `@mfe/design-system/tailwind-theme.css` import,
+  which is where the shared `--*-color-ds-navy` etc. theme variables actually get
+  declared) — applying it to only one silently produces an *empty* compiled stylesheet
+  with this Tailwind version (4.3.3), not a partially-prefixed one. This was verified
+  directly against the CLI; the public docs and community discussions on this point are
+  inconsistent, so don't take a stale blog post's word for it if you're debugging this.
+- **Source must write the prefixed class name directly** — `className="bk:flex"`, not
+  `className="flex"` expecting Tailwind to add the prefix for you.
+
+`@mfe/design-system`'s own `tailwind-input.css` (the one file that ships global Preflight,
+imported exactly once by the Shell — see "Why offline works" for why that stays singular)
+is deliberately **not** prefixed: it generates zero utility classes of its own
+(`source(none)`), so there's nothing for a prefix to namespace, and prefixing it would
+work against the very thing every app's prefix exists to protect. The hand-authored CSS
+classes everything still shares (`.mfe-panel`, `.nav-tab`, `.ds-button`, …) aren't
+Tailwind-generated either, so they're untouched by any of this — same one global
+`styles.css`/`@mfe/design-system/styles.css`, same class names, on purpose.
+
+This is also what makes running one MFE standalone (`pnpm --filter @mfe/bookings-mfe
+dev`) safe to reason about in isolation: whatever utility classes render are provably
+*this app's own*, never a same-named class another app happened to define differently.
+
+### Sharing Shell state with an MFE (a version-pinned Context, not props)
+
+`packages/shared-state` exports a small React Context (`ShellStateProvider` /
+`useShellState`) that carries the Shell's session (see `SessionBadge.tsx`) and a trivial
+piece of mutable state — a notification counter — down into every MFE, and back up
+again:
+
+```
+Shell (owns ShellStateProvider, mounted once in App.tsx)
+  │  value: { session, notificationCount, lastNotification, notify() }
+  ▼
+Bookings MFE (BookingsList.tsx) — useShellState()
+  - reads session.user directly, no re-fetch of its own
+  - calls notify("...") from a "Notify crew" button
+  ▼
+Shell's own SessionBadge — also useShellState()
+  - re-renders with the updated notificationCount instantly, no page reload
+```
+
+This is a genuinely different mechanism from the `react`/`react-dom` sharing above, even
+though the setup looks the same: `@mfe/shared-state` is listed as a version-pinned
+`singleton` (`requiredVersion` + `strictVersion`, exactly like `@mfe/design-system`) in
+*both* the Shell's and Bookings' `rspack.config.mjs`. That pinning isn't optional here —
+`ShellStateContext` is created once, by `createContext()`, inside that package's source.
+If the Shell and Bookings each bundled their *own* independently-built copy of
+`@mfe/shared-state` (i.e. it were shared without `singleton: true`, or not shared at
+all), each copy's `createContext()` call would produce a distinct context identity, and
+`useShellState()` inside the MFE would silently read the context's default value (`null`)
+instead of the Shell's actual `Provider` value — a classic Module Federation footgun for
+any cross-app Context, not just this one. `useShellState()` returns `null` gracefully
+(rather than throwing) specifically so an MFE's own standalone dev mode — which never
+mounts `ShellStateProvider` — degrades instead of crashing (see
+`apps/bookings-mfe/src/bootstrap.tsx`).
+
+Prop-drilling (the Shell passing values as props to `<Component sessionUser={...} />`)
+is the simpler alternative and doesn't need any of this singleton plumbing — it's the
+better default for most Shell → MFE data. Context is worth the extra setup specifically
+when state also needs to flow MFE → Shell, or Shell → many independently-loaded MFEs at
+once, without every intermediate layer having to know about it.
+
 ### Why authentication is explicitly out of scope here
 
 **Module Federation being offline does not automatically make authentication offline.**
@@ -250,13 +385,14 @@ is a separate project from this one.
 offline-mfe-poc/
 ├── apps/
 │   ├── shell/            # Host app: manifest fetch, nav, MFE slots, error/loading states
-│   ├── bookings-mfe/     # Remote: exposes ./BookingsApp
+│   ├── bookings-mfe/     # Remote: exposes ./BookingsApp (owns its own /:cabinSlug sub-route)
 │   ├── dining-mfe/       # Remote: exposes ./DiningApp
 │   ├── payment-mfe/      # Remote: exposes ./PaymentApp
 │   └── ship-server/      # Express server: serves Shell, MFE releases, manifest, mock API
 ├── packages/
 │   ├── shared-types/     # MfeManifest contract + isMfeManifest() runtime validator
-│   └── shared-config/    # MANIFEST_PATH, ports — structural constants, not URLs
+│   ├── shared-config/    # MANIFEST_PATH, ports — structural constants, not URLs
+│   └── shared-state/     # Cross-app Context: ShellStateProvider / useShellState()
 ├── releases/             # Shore-side staged release artifacts (build-release output)
 ├── scripts/               # build / package / validate / deploy / activate / rollback / seed
 │   └── lib/               # shared script logic (paths, fs helpers, validation, history)

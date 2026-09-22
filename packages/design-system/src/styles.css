@@ -5,6 +5,15 @@
   --ds-color-navy: #0b1f33;
   --ds-color-navy-light: #12314f;
   --ds-color-background: #f4f7fa;
+
+  --ds-color-accent: #17b8a6;
+  --ds-color-accent-dark: #0d8d80;
+  --ds-color-accent-bg: #e4f8f5;
+
+  --ds-color-text: #172b3f;
+  --ds-color-text-muted: #5b6b7a;
+  --ds-color-border: #e2e8f0;
+
   --ds-color-success: #2f6f3f;
   --ds-color-success-bg: #eef6ee;
   --ds-color-danger: #a12727;
@@ -12,39 +21,75 @@
 
   --ds-radius-sm: 6px;
   --ds-radius-md: 10px;
+  --ds-radius-lg: 16px;
   --ds-radius-pill: 999px;
 
   --ds-space-xs: 4px;
   --ds-space-sm: 8px;
   --ds-space-md: 16px;
   --ds-space-lg: 24px;
+  --ds-space-xl: 32px;
+
+  --ds-shadow-sm: 0 1px 2px rgba(11, 31, 51, 0.08);
+  --ds-shadow-md: 0 4px 16px rgba(11, 31, 51, 0.1);
+  --ds-shadow-lg: 0 16px 40px rgba(11, 31, 51, 0.16);
 
   --ds-font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 .ds-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font: inherit;
   font-family: var(--ds-font-sans);
+  font-weight: 600;
   border-radius: var(--ds-radius-sm);
-  padding: 6px 16px;
+  padding: 7px 16px;
   font-size: 14px;
   cursor: pointer;
   border: 1px solid transparent;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+}
+
+.ds-button:active {
+  transform: translateY(1px);
+}
+
+.ds-button:focus-visible {
+  outline: 2px solid var(--ds-color-accent);
+  outline-offset: 2px;
 }
 
 .ds-button-primary {
   background: var(--ds-color-navy);
   color: white;
+  box-shadow: var(--ds-shadow-sm);
+}
+
+.ds-button-primary:hover {
+  background: var(--ds-color-navy-light);
 }
 
 .ds-button-secondary {
   background: transparent;
-  border-color: var(--ds-color-navy);
+  border-color: var(--ds-color-border);
   color: var(--ds-color-navy);
 }
 
+.ds-button-secondary:hover {
+  border-color: var(--ds-color-navy);
+  background: var(--ds-color-background);
+}
+
 .ds-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--ds-font-sans);
   font-size: 13px;
   padding: var(--ds-space-xs) var(--ds-space-sm);
@@ -62,10 +107,222 @@
   font-weight: 600;
 }
 
+.ds-badge-accent {
+  background: var(--ds-color-accent-bg);
+  color: var(--ds-color-accent-dark);
+  font-weight: 600;
+}
+
 .ds-card {
   font-family: var(--ds-font-sans);
   background: white;
+  border: 1px solid var(--ds-color-border);
   border-radius: var(--ds-radius-md);
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--ds-shadow-sm);
+}
+
+/* Deliberately NOT styled like real content (.mfe-detail, .ds-card, ...):
+   a dashed border and the accent color are what make a <HelperNote> read
+   as "developer commentary for this demo", not product UI, at a glance. */
+.ds-helper-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 8px 12px;
+  border: 1px dashed var(--ds-color-accent);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-color-accent-bg);
+  color: var(--ds-color-accent-dark);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.ds-helper-note svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ds-helper-note code {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", monospace;
+  font-size: 0.92em;
+  background: rgba(13, 141, 128, 0.12);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+/* Base page look, and the .mfe-* content classes every MFE's own screens
+   use (panels, rows, sub-nav tabs, back-links, ...). These live here —
+   not in the Shell — because they are rendered from INSIDE an MFE's own
+   component tree (e.g. BookingsList.tsx uses .mfe-row directly), not just
+   around it. Since every app (the Shell, and every MFE's own standalone
+   bootstrap.tsx — see apps/bookings-mfe/src/bootstrap.tsx) already imports
+   this one file exactly once, an MFE run standalone
+   (`pnpm --filter @mfe/bookings-mfe dev`) renders fully styled, not just
+   Preflight-reset plain text — no Shell required for that.
+
+   The Shell's OWN chrome (header, nav, release bar, the .mfe-slot-loading
+   / .mfe-slot-error remote-load states) stays in apps/shell/src/styles.css
+   — those are things the Shell renders AROUND an MFE, never inside one,
+   and standalone mode has nothing to load in the first place. */
+
+:root {
+  color-scheme: light;
+  font-family: var(--ds-font-sans);
+}
+
+body {
+  margin: 0;
+  background: var(--ds-color-background);
+  color: var(--ds-color-text);
+}
+
+/* Tailwind's Preflight doesn't touch anchor color/decoration, so without
+   this, plain content links (e.g. "View guest" inside a list row) would
+   render as default browser blue. .mfe-tab/.mfe-back-link below override
+   this where they need their own color/hover behavior; the Shell's own
+   .nav-tab does the same in its own stylesheet. */
+a {
+  color: var(--ds-color-navy-light);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font: inherit;
+}
+
+/* The card an MFE's content renders inside — in production this is the
+   Shell's RemoteLoader wrapping the loaded remote; in standalone dev mode
+   each app's own bootstrap.tsx wraps itself in one directly, for visual
+   parity without needing a Shell at all. */
+.mfe-slot {
+  background: white;
+  border: 1px solid var(--ds-color-border);
+  border-radius: var(--ds-radius-lg);
+  padding: 24px;
+  box-shadow: var(--ds-shadow-md);
+  min-height: 140px;
+  box-sizing: border-box;
+}
+
+/* Explicit here because Tailwind's Preflight resets h1-h6 to
+   font-size/font-weight: inherit — these used to come from the browser's
+   default UA stylesheet, silently, until Preflight was added. */
+.mfe-panel h2 {
+  margin-top: 0;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.mfe-panel h3 {
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ds-color-text-muted);
+  margin: 20px 0 8px;
+}
+
+.mfe-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ds-color-navy-light);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.mfe-back-link:hover {
+  text-decoration: underline;
+}
+
+.mfe-row {
+  border-top: 1px solid #eef1f5;
+  padding: 14px 6px;
+  margin: 0 -6px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.mfe-row:hover {
+  background: #f8fafc;
+}
+
+.mfe-row:first-of-type {
+  border-top: none;
+}
+
+.mfe-row-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.mfe-detail {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--ds-color-success-bg);
+  border-left: 3px solid var(--ds-color-success);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.mfe-note {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--ds-color-success);
+  font-weight: 600;
+}
+
+.mfe-amount {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 4px 0 16px;
+  letter-spacing: -0.5px;
+}
+
+/* Sub-navigation tabs an MFE uses for its OWN nested routes (e.g. the
+   Overview / Itinerary / Guests tabs on a booking's detail page). Distinct
+   from the Shell's own .nav-tab (styled for its dark header) since these
+   render on a white .mfe-panel background. */
+.mfe-subnav {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.mfe-tab {
+  border: 1px solid var(--ds-color-border);
+  color: var(--ds-color-navy-light);
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: var(--ds-radius-pill);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.mfe-tab:hover {
+  border-color: var(--ds-color-navy-light);
+  text-decoration: none;
+}
+
+.mfe-tab-active {
+  background: var(--ds-color-navy-light);
+  color: white;
+  border-color: var(--ds-color-navy-light);
+  font-weight: 600;
 }

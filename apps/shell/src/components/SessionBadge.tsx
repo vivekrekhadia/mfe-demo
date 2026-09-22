@@ -1,11 +1,5 @@
-import { useEffect, useState } from "react";
-import { MOCK_SESSION_PATH } from "@mfe/shared-config";
-import { Badge } from "@mfe/design-system";
-
-interface Session {
-  user: string;
-  authenticatedVia: string;
-}
+import { useShellState } from "@mfe/shared-state";
+import { Badge, Icon } from "@mfe/design-system";
 
 /**
  * Deliberately trivial: a real ship-local identity provider is a separate
@@ -13,30 +7,32 @@ interface Session {
  * This only proves the point that *some* session data can be served
  * entirely from the Ship Server, with no cloud round-trip, so the Shell
  * never blocks on connectivity it doesn't have.
+ *
+ * Reads via useShellState() rather than fetching itself: the Shell's own
+ * header and every MFE now read the exact same ShellStateProvider value
+ * (see App.tsx and @mfe/shared-state), so this component also doubles as
+ * proof that writes an MFE makes (see Bookings' "Notify crew" button) are
+ * visible back here, in the Shell, without a page reload.
  */
 export function SessionBadge() {
-  const [session, setSession] = useState<Session | null>(null);
+  const shellState = useShellState();
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch(MOCK_SESSION_PATH)
-      .then((res) => res.json())
-      .then((data: Session) => {
-        if (!cancelled) setSession(data);
-      })
-      .catch(() => {
-        if (!cancelled) setSession(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  if (!shellState?.session) return null;
 
-  if (!session) return null;
+  const { session, notificationCount } = shellState;
 
   return (
-    <Badge title={`Authenticated via ${session.authenticatedVia}`}>
-      {session.user}
-    </Badge>
+    <div className="sh:flex sh:items-center sh:gap-2">
+      {notificationCount > 0 && (
+        <Badge tone="accent" title={shellState.lastNotification ?? undefined}>
+          <Icon name="bell" size={13} />
+          {notificationCount} notification{notificationCount === 1 ? "" : "s"}
+        </Badge>
+      )}
+      <Badge title={`Authenticated via ${session.authenticatedVia}`}>
+        <Icon name="user" size={13} />
+        {session.user}
+      </Badge>
+    </div>
   );
 }

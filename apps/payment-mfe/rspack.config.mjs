@@ -12,6 +12,16 @@ const require = createRequire(import.meta.url);
 // instead of silently sharing whichever @mfe/design-system version another
 // independently-released remote happened to load first.
 const { version: designSystemVersion } = require("@mfe/design-system/package.json");
+// See apps/shell/rspack.config.mjs for why @mfe/shared-state must be a
+// version-pinned singleton (it exports a React Context, whose identity
+// must match the Shell's Provider exactly). Needed here even though this
+// app's own source only imports it indirectly, through @mfe/design-system's
+// <HelperNote> — Module Federation's shared scope intercepts an import of
+// a registered specifier no matter how deep in the dependency graph it
+// comes from, so this MFE would otherwise silently bundle its own,
+// differently-identitied copy of the context and never see the Shell's
+// real showHelperNotes value.
+const { version: sharedStateVersion } = require("@mfe/shared-state/package.json");
 
 export default {
   mode: "production",
@@ -53,9 +63,18 @@ export default {
       shared: {
         react: { singleton: true },
         "react-dom": { singleton: true },
+        // Singleton so this MFE's own nested <Routes> share the Shell's
+        // single <BrowserRouter> instance rather than mounting a second,
+        // disconnected router (see apps/shell/rspack.config.mjs).
+        "react-router-dom": { singleton: true },
         "@mfe/design-system": {
           singleton: true,
           requiredVersion: designSystemVersion,
+          strictVersion: true,
+        },
+        "@mfe/shared-state": {
+          singleton: true,
+          requiredVersion: sharedStateVersion,
           strictVersion: true,
         },
       },

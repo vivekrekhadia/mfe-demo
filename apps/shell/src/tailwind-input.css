@@ -9,7 +9,31 @@
 
    Pulls in the shared theme (ds-navy, ds-space-*, etc.) from
    @mfe/design-system so utility classes built from it (bg-ds-navy, ...)
-   resolve to the same values used by every MFE. */
-@import "tailwindcss/theme" layer(theme);
-@import "@mfe/design-system/tailwind-theme.css" layer(theme);
-@import "tailwindcss/utilities" layer(utilities) source(".");
+   resolve to the same underlying --ds-* values used by every MFE.
+
+   prefix(sh) namespaces every generated utility class (sh:flex, not flex)
+   and every generated theme CSS variable (--sh-color-ds-navy, not
+   --color-ds-navy) to this app alone. Each app in the workspace picks its
+   own prefix (bk = bookings, dn = dining, pm = payment) so two
+   independently-built, independently-released bundles loaded on the same
+   page (the whole point of Module Federation here) can never define a
+   same-named Tailwind class or theme variable with a different value —
+   there is nothing to "last one wins" on. It also means opening any one
+   app standalone (`pnpm --filter <app> dev`) renders with exactly the
+   classes that app's own compiled CSS defines, nothing borrowed from (or
+   clobbered by) another app that merely happens to share a class name.
+   The shared, hand-authored CSS classes (.mfe-panel, .nav-tab, .ds-button
+   and friends, in styles.css and @mfe/design-system/styles.css) are NOT
+   Tailwind-generated, so they are untouched by this — see the README
+   section "Per-app Tailwind prefixes" for the full picture.
+
+   prefix() must be applied to EVERY Tailwind-owned import in this file
+   (both the theme and utilities imports) — applying it to only one, or
+   only to the utilities import, silently produces an empty stylesheet
+   with this version of the Tailwind CLI (verified directly; the community
+   docs on this are inconsistent). The shared design-system theme import
+   needs it too, since that's where the shared --*-color-ds-navy etc.
+   theme variables actually get declared. */
+@import "tailwindcss/theme" layer(theme) prefix(sh);
+@import "@mfe/design-system/tailwind-theme.css" layer(theme) prefix(sh);
+@import "tailwindcss/utilities" layer(utilities) prefix(sh) source(".");

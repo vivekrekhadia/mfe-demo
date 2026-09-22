@@ -15,7 +15,16 @@
    Preflight or re-declaring the theme's :root variables in this file's
    own output. source(".") scopes the JIT content scan to this file's own
    directory (./src) — without it, automatic detection scans from the
-   working directory the CLI was invoked in and picks up node_modules. */
-@import "tailwindcss/theme" layer(theme);
-@import "@mfe/design-system/tailwind-theme.css" layer(theme);
-@import "tailwindcss/utilities" layer(utilities) source(".");
+   working directory the CLI was invoked in and picks up node_modules.
+
+   prefix(pm) namespaces every class this app generates (pm:flex, not
+   flex) and every theme variable (--pm-color-ds-navy, not --color-ds-navy)
+   to Payment alone, so its compiled CSS can never collide with another
+   independently-built MFE's — see apps/shell/src/tailwind-input.css for
+   the full rationale and the "must be on every Tailwind import, verified
+   directly" caveat. Source (PaymentApp.tsx etc.) must write the prefixed
+   class names directly (className="pm:flex pm:gap-2") — Tailwind does not
+   add the prefix for you. */
+@import "tailwindcss/theme" layer(theme) prefix(pm);
+@import "@mfe/design-system/tailwind-theme.css" layer(theme) prefix(pm);
+@import "tailwindcss/utilities" layer(utilities) prefix(pm) source(".");

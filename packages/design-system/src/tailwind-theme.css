@@ -15,6 +15,12 @@
   --color-ds-navy: var(--ds-color-navy);
   --color-ds-navy-light: var(--ds-color-navy-light);
   --color-ds-background: var(--ds-color-background);
+  --color-ds-accent: var(--ds-color-accent);
+  --color-ds-accent-dark: var(--ds-color-accent-dark);
+  --color-ds-accent-bg: var(--ds-color-accent-bg);
+  --color-ds-text: var(--ds-color-text);
+  --color-ds-text-muted: var(--ds-color-text-muted);
+  --color-ds-border: var(--ds-color-border);
   --color-ds-success: var(--ds-color-success);
   --color-ds-success-bg: var(--ds-color-success-bg);
   --color-ds-danger: var(--ds-color-danger);
@@ -22,12 +28,18 @@
 
   --radius-ds-sm: var(--ds-radius-sm);
   --radius-ds-md: var(--ds-radius-md);
+  --radius-ds-lg: var(--ds-radius-lg);
   --radius-ds-pill: var(--ds-radius-pill);
 
   --spacing-ds-xs: var(--ds-space-xs);
   --spacing-ds-sm: var(--ds-space-sm);
   --spacing-ds-md: var(--ds-space-md);
   --spacing-ds-lg: var(--ds-space-lg);
+  --spacing-ds-xl: var(--ds-space-xl);
+
+  --shadow-ds-sm: var(--ds-shadow-sm);
+  --shadow-ds-md: var(--ds-shadow-md);
+  --shadow-ds-lg: var(--ds-shadow-lg);
 
   --font-sans: var(--ds-font-sans);
 }

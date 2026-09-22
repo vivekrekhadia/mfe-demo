@@ -1,54 +1,115 @@
-:root {
-  color-scheme: light;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-}
-
-body {
-  margin: 0;
-  background: #0b1f33;
-  color: #0b1f33;
-}
+/* Everything an MFE's own content needs (.mfe-panel, .mfe-row, .mfe-tab,
+   base page/anchor/button styling, design tokens, ...) lives in
+   @mfe/design-system/styles.css instead — see that file's header comment
+   for why. This file only has the Shell's OWN chrome: things the Shell
+   renders AROUND an MFE (header, nav, release bar, the loading/error
+   states around a not-yet-loaded remote), never inside one. */
 
 .shell-app {
   min-height: 100vh;
-  background: #f4f7fa;
+  display: flex;
+  flex-direction: column;
 }
 
 .shell-header {
-  background: #0b1f33;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(135deg, var(--ds-color-navy) 0%, var(--ds-color-navy-light) 100%);
   color: white;
   padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 12px rgba(11, 31, 51, 0.25);
+}
+
+.shell-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shell-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--ds-radius-md);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--ds-color-accent);
+  flex-shrink: 0;
 }
 
 .shell-header h1 {
   margin: 0;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 600;
+  letter-spacing: 0.1px;
+}
+
+.helper-notes-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 6px 12px;
+  border-radius: var(--ds-radius-pill);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.helper-notes-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: white;
 }
 
 .shell-nav {
   display: flex;
-  gap: 8px;
-  padding: 12px 24px;
-  background: #12314f;
+  gap: 6px;
+  padding: 10px 24px;
+  background: var(--ds-color-navy);
+  overflow-x: auto;
 }
 
 .nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 6px 16px;
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 7px 16px;
+  border-radius: var(--ds-radius-pill);
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.nav-tab:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+  text-decoration: none;
 }
 
 .nav-tab-active {
   background: white;
-  color: #0b1f33;
+  color: var(--ds-color-navy);
+  border-color: white;
   font-weight: 600;
 }
 
@@ -59,40 +120,67 @@ body {
   gap: 8px;
   padding: 8px 24px;
   background: #dce7f2;
-  color: #12314f;
-  font-size: 13px;
+  color: var(--ds-color-navy-light);
+  font-size: 12.5px;
+  border-bottom: 1px solid #c7d8e8;
+}
+
+.release-bar-main {
+  font-weight: 600;
+}
+
+.release-bar-versions {
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-color-text-muted);
 }
 
 .shell-main {
-  padding: 24px;
-  max-width: 640px;
+  flex: 1;
+  padding: 32px 24px 48px;
+  max-width: 720px;
+  width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
-.mfe-slot {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-  min-height: 120px;
-}
-
+/* .mfe-slot itself (the card look) lives in @mfe/design-system/styles.css
+   — these are just the two state-specific modifiers layered on top of it
+   while a remote is loading or failed to load, which only ever happens
+   here in the Shell (a standalone MFE has nothing to "load"). */
 .mfe-slot-loading {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #667;
-  font-size: 14px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mfe-skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef2f6 25%, #e3e9f0 37%, #eef2f6 63%);
+  background-size: 400% 100%;
+  animation: mfe-shimmer 1.4s ease infinite;
+}
+
+@keyframes mfe-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 .mfe-slot-error {
-  border: 1px solid #e2a2a2;
-  background: #fdf1f1;
+  border-color: #f0c6c6;
+  background: var(--ds-color-danger-bg);
 }
 
 .mfe-slot-error-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
-  color: #a12727;
+  color: var(--ds-color-danger);
   margin: 0 0 4px;
 }
 
@@ -100,57 +188,4 @@ body {
   margin: 0 0 12px;
   color: #7a2f2f;
   font-size: 14px;
-}
-
-/* Explicit here because Tailwind's Preflight (imported once in
-   bootstrap.tsx) resets h1-h6 to font-size/font-weight: inherit — these
-   used to come from the browser's default UA stylesheet, silently, until
-   Preflight was added. */
-.mfe-panel h2 {
-  margin-top: 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.mfe-panel h3 {
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.mfe-row {
-  border-top: 1px solid #eaeef2;
-  padding: 12px 0;
-}
-
-.mfe-row:first-of-type {
-  border-top: none;
-}
-
-.mfe-row-title {
-  font-weight: 600;
-}
-
-.mfe-detail {
-  margin-top: 12px;
-  padding: 10px;
-  background: #eef6ee;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.mfe-note {
-  margin-top: 6px;
-  font-size: 13px;
-  color: #2f6f3f;
-  font-weight: 600;
-}
-
-.mfe-amount {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 4px 0 16px;
-}
-
-button {
-  font: inherit;
 }

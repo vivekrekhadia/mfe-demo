@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from "react";
+import { Icon } from "@mfe/design-system";
 
 interface Props {
   label: string;
@@ -33,11 +34,16 @@ export class RemoteErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="mfe-slot mfe-slot-error">
-          <p className="mfe-slot-error-title">Unable to load {this.props.label}.</p>
+          <p className="mfe-slot-error-title">
+            <Icon name="bell" size={16} />
+            Unable to load {this.props.label}.
+          </p>
           <p className="mfe-slot-error-detail">
             The {this.props.label} service is currently unavailable.
           </p>
-          <button onClick={this.reset}>Retry</button>
+          <button className="ds-button ds-button-primary" onClick={this.reset}>
+            Retry
+          </button>
         </div>
       );
     }

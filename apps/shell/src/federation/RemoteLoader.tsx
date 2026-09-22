@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type ComponentType } from "react";
+import { Icon } from "@mfe/design-system";
 import { RemoteErrorBoundary } from "./RemoteErrorBoundary";
 import { loadRemoteComponent } from "./loadRemoteComponent";
 
@@ -40,17 +41,27 @@ export function RemoteLoader({ label, loader }: RemoteLoaderProps) {
   }, [load, attempt]);
 
   if (state.status === "loading") {
-    return <div className="mfe-slot mfe-slot-loading">Loading {label}...</div>;
+    return (
+      <div className="mfe-slot mfe-slot-loading" aria-label={`Loading ${label}`}>
+        <div className="mfe-skeleton-line" style={{ width: "35%" }} />
+        <div className="mfe-skeleton-line" style={{ width: "85%" }} />
+        <div className="mfe-skeleton-line" style={{ width: "70%" }} />
+        <div className="mfe-skeleton-line" style={{ width: "50%" }} />
+      </div>
+    );
   }
 
   if (state.status === "error") {
     return (
       <div className="mfe-slot mfe-slot-error">
-        <p className="mfe-slot-error-title">Unable to load {label}.</p>
-        <p className="mfe-slot-error-detail">
-          The {label} service is currently unavailable.
+        <p className="mfe-slot-error-title">
+          <Icon name="bell" size={16} />
+          Unable to load {label}.
         </p>
-        <button onClick={() => setAttempt((a) => a + 1)}>Retry</button>
+        <p className="mfe-slot-error-detail">The {label} service is currently unavailable.</p>
+        <button className="ds-button ds-button-primary" onClick={() => setAttempt((a) => a + 1)}>
+          Retry
+        </button>
       </div>
     );
   }

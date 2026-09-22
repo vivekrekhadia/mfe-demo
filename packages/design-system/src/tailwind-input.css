@@ -9,6 +9,13 @@
    in this package's own source uses Tailwind utility classes, and scanning
    shouldn't reach into apps/* — each MFE scans its own source independently
    via its own tailwind-input.css (theme + utilities only, no Preflight;
-   see apps/bookings-mfe/src/tailwind-input.css for the pattern). */
+   see apps/bookings-mfe/src/tailwind-input.css for the pattern).
+
+   Deliberately NOT prefixed, unlike every app's own tailwind-input.css:
+   this file generates no utility classes at all (source(none)), so a
+   prefix would have nothing to namespace, and it's the one Preflight/reset
+   that's meant to be global and singular in the first place — the whole
+   point of every other app's prefix is to stay out of exactly this file's
+   way, not the reverse. */
 @import "tailwindcss" source(none);
 @import "./tailwind-theme.css";

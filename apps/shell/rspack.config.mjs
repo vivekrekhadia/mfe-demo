@@ -13,6 +13,12 @@ const require = createRequire(import.meta.url);
 // instead of silently sharing whichever @mfe/design-system version an
 // independently-released remote happened to load first.
 const { version: designSystemVersion } = require("@mfe/design-system/package.json");
+// Same reasoning as @mfe/design-system: shared-state's value is a React
+// Context object. Two independently-bundled copies of createContext() are
+// two different identities, so this MUST be a version-pinned singleton or
+// an MFE's useShellState() would silently read the default (null) value
+// instead of the Shell's actual Provider.
+const { version: sharedStateVersion } = require("@mfe/shared-state/package.json");
 
 // Dev-only manifest override. Reads apps/shell/.env.local (gitignored, see
 // .env.local.example) if present. ship:build never has this file, so a
@@ -118,9 +124,19 @@ export default {
       shared: {
         react: { singleton: true },
         "react-dom": { singleton: true },
+        // Singleton so a nested <Routes> declared inside an MFE (e.g.
+        // Bookings' sub-routes) shares the same router context the Shell's
+        // <BrowserRouter> created, instead of a second react-router-dom
+        // instance that can't see the Shell's history/location.
+        "react-router-dom": { singleton: true },
         "@mfe/design-system": {
           singleton: true,
           requiredVersion: designSystemVersion,
+          strictVersion: true,
+        },
+        "@mfe/shared-state": {
+          singleton: true,
+          requiredVersion: sharedStateVersion,
           strictVersion: true,
         },
       },

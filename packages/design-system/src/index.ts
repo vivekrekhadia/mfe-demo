@@ -4,4 +4,8 @@ export { Badge } from "./Badge";
 export type { BadgeProps } from "./Badge";
 export { Card } from "./Card";
 export type { CardProps } from "./Card";
+export { Icon } from "./Icon";
+export type { IconProps, IconName } from "./Icon";
+export { HelperNote } from "./HelperNote";
+export type { HelperNoteProps } from "./HelperNote";
 export { tokens } from "./tokens";

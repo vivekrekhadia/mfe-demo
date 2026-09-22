@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Button } from "@mfe/design-system";
+import { Route, Routes } from "react-router-dom";
 // Imported here (the exposed Module Federation module), not in
 // bootstrap.tsx: bootstrap.tsx is only used for this MFE's standalone dev
 // mode and is never part of what the Shell actually loads at runtime — the
@@ -7,36 +6,45 @@ import { Button } from "@mfe/design-system";
 // import("bookings/BookingsApp"). Preflight/theme (@mfe/design-system's
 // tailwind.css) is NOT imported here — the Shell owns that one global copy.
 import "./tailwind.css";
+import { BookingsList } from "./BookingsList";
+import { BookingDetail } from "./BookingDetail";
+import { BookingOverview } from "./BookingOverview";
+import { BookingItinerary } from "./BookingItinerary";
+import { GuestsLayout } from "./GuestsLayout";
+import { GuestsList } from "./GuestsList";
+import { GuestDetail } from "./GuestDetail";
 
-interface Booking {
-  cabin: string;
-  checkIn: string;
-  checkOut: string;
-}
-
-const bookings: Booking[] = [{ cabin: "Cabin 1204", checkIn: "20 Sep", checkOut: "27 Sep" }];
-
+/**
+ * Mounted by the Shell at "/bookings/*" (see apps/shell/src/App.tsx). The
+ * "/*" is what lets this component own sub-routes of its own — the Shell
+ * never needs to know any of this exists. These <Routes> are relative to
+ * wherever the Shell mounted this component, and they share the Shell's
+ * single <BrowserRouter> instance (react-router-dom is a Module Federation
+ * singleton — see rspack.config.mjs), so browser back/forward and
+ * deep-linking work exactly as if this were one app.
+ *
+ * Three levels deep, to show routes can nest as far as any single-repo app
+ * would nest them:
+ *
+ *   /bookings                          BookingsList        (level 1)
+ *   /bookings/:cabinSlug               BookingDetail        (level 2, a layout with its own sub-nav + <Outlet>)
+ *   /bookings/:cabinSlug/itinerary     BookingItinerary      (level 2 sibling)
+ *   /bookings/:cabinSlug/guests        GuestsLayout          (level 2 sibling, itself a layout)
+ *   /bookings/:cabinSlug/guests/:id    GuestDetail            (level 3 — a child of a child)
+ */
 export function BookingsApp() {
-  const [viewing, setViewing] = useState<string | null>(null);
-
   return (
-    <section className="mfe-panel">
-      <h2>Bookings</h2>
-      <h3>Upcoming bookings</h3>
-      {bookings.map((b) => (
-        <div key={b.cabin} className="mfe-row">
-          <div className="mfe-row-title">{b.cabin}</div>
-          <div>Check-in: {b.checkIn}</div>
-          <div>Check-out: {b.checkOut}</div>
-          <div className="mfe-note">Dinner reservation confirmed</div>
-          <div className="flex items-center gap-2">
-            <Button onClick={() => setViewing(b.cabin)}>View Booking</Button>
-            <span className="rounded-ds-pill bg-ds-navy px-3 py-1 text-xs text-white">Tailwind-styled tag</span>
-          </div>
-        </div>
-      ))}
-      {viewing && <p className="mfe-detail">Booking details for {viewing} confirmed.</p>}
-    </section>
+    <Routes>
+      <Route index element={<BookingsList />} />
+      <Route path=":cabinSlug" element={<BookingDetail />}>
+        <Route index element={<BookingOverview />} />
+        <Route path="itinerary" element={<BookingItinerary />} />
+        <Route path="guests" element={<GuestsLayout />}>
+          <Route index element={<GuestsList />} />
+          <Route path=":guestId" element={<GuestDetail />} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }
 

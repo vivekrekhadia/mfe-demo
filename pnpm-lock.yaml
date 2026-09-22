@@ -20,12 +20,18 @@ importers:
       '@mfe/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
+      '@mfe/shared-state':
+        specifier: workspace:*
+        version: link:../../packages/shared-state
       react:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      react-router-dom:
+        specifier: ^6.28.0
+        version: 6.30.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@module-federation/runtime-tools':
         specifier: ^2.9.0
@@ -60,12 +66,18 @@ importers:
       '@mfe/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
+      '@mfe/shared-state':
+        specifier: workspace:*
+        version: link:../../packages/shared-state
       react:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      react-router-dom:
+        specifier: ^6.28.0
+        version: 6.30.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@module-federation/runtime-tools':
         specifier: ^2.9.0
@@ -100,12 +112,18 @@ importers:
       '@mfe/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
+      '@mfe/shared-state':
+        specifier: workspace:*
+        version: link:../../packages/shared-state
       react:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      react-router-dom:
+        specifier: ^6.28.0
+        version: 6.30.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@module-federation/runtime-tools':
         specifier: ^2.9.0
@@ -143,6 +161,9 @@ importers:
       '@mfe/shared-config':
         specifier: workspace:*
         version: link:../../packages/shared-config
+      '@mfe/shared-state':
+        specifier: workspace:*
+        version: link:../../packages/shared-state
       '@mfe/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
@@ -192,6 +213,9 @@ importers:
 
   packages/design-system:
     dependencies:
+      '@mfe/shared-state':
+        specifier: workspace:*
+        version: link:../shared-state
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -210,6 +234,19 @@ importers:
         version: 5.9.3
 
   packages/shared-config: {}
+
+  packages/shared-state:
+    dependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.31
+      typescript:
+        specifier: ^5.6.2
+        version: 5.9.3
 
   packages/shared-types: {}
 
