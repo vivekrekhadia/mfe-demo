@@ -9,9 +9,10 @@ export function LineItemsList() {
   return (
     <div>
       <HelperNote>
-        <code>/items</code> and <code>/items/:itemId</code> are a third level of nested{" "}
-        <code>&lt;Route&gt;</code> — a child of a child — still entirely inside this one MFE. See
-        LineItemsLayout.tsx.
+        Route: <code>/payments/:invoiceId/items</code> (index). This and its sibling{" "}
+        <code>/items/:itemId</code> are a third level of nested <code>&lt;Route&gt;</code> — a
+        child of a child — still entirely inside this one MFE. LineItemsLayout.tsx (the parent
+        route) renders no UI of its own, only an <code>&lt;Outlet&gt;</code>.
       </HelperNote>
       <p className="mfe-note">Line items for {invoice.label}</p>
       {invoice.items.map((item) => (

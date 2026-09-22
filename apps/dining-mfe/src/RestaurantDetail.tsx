@@ -26,8 +26,10 @@ export function RestaurantDetail() {
         <>
           <h3>{restaurant.name}</h3>
           <HelperNote>
-            <code>/dining/{restaurantSlug}</code> and its Menu / Reviews tabs are routes this MFE
-            owns entirely — the Shell's own route config only ever says <code>/dining/*</code>.
+            Route: <code>/dining/{restaurantSlug}</code> — a layout, not a leaf: it renders the
+            tabs below and an <code>&lt;Outlet&gt;</code> for whichever child route currently
+            matches (Menu, Reviews). Both are routes this MFE owns entirely — the Shell's own
+            route config only ever says <code>/dining/*</code>.
           </HelperNote>
           <nav className="mfe-subnav">
             <NavLink end to="." className={tabClass}>

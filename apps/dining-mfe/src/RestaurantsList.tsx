@@ -9,9 +9,10 @@ export function RestaurantsList() {
       <h2>Dining</h2>
 
       <HelperNote>
-        This whole screen is the <code>dining</code> remote's own <code>RestaurantsList</code>{" "}
-        component — loaded on demand via <code>import("dining/DiningApp")</code>, never bundled
-        into the Shell (see apps/shell/src/federation/remoteImports.ts).
+        Route: <code>/dining</code> (index) — this whole screen is the <code>dining</code>{" "}
+        remote's own <code>RestaurantsList</code> component, loaded on demand via{" "}
+        <code>import("dining/DiningApp")</code>, never bundled into the Shell (see
+        apps/shell/src/federation/remoteImports.ts).
       </HelperNote>
 
       <h3>Today's restaurants</h3>

@@ -19,13 +19,25 @@ import { BookingsApp } from "./BookingsApp";
 // apps/shell/src/bootstrap.tsx). There's no ShellStateProvider here, so
 // useShellState() correctly returns null in this mode (see BookingsList.tsx).
 //
+// basename is derived from the current URL rather than hardcoded, because
+// this same bundle is served from a different path depending on where it's
+// deployed: "/" for local dev (localhost:5001), "/mfe/bookings" for the
+// Vercel static demo, and "/mfe/releases/<release>/bookings" under the ship
+// server (see the publicPath comment in rspack.config.mjs). Whatever path
+// this index.html was actually loaded from IS that prefix, since this
+// standalone entry is only ever loaded fresh at its own root (deep links
+// into sub-routes aren't served statically, so there's no other pathname
+// this could see at initial load).
+//
 // The .mfe-slot wrapper here is the same card the Shell's RemoteLoader
 // wraps this component in during production (see @mfe/design-system's
 // styles.css) — reused here so standalone dev mode looks like the real
 // thing, not just Preflight-reset plain text.
+const standaloneBasename = window.location.pathname.replace(/\/$/, "");
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={standaloneBasename}>
       <div style={{ maxWidth: 480, margin: "24px auto", padding: "0 16px" }}>
         <HelperNote>
           Standalone dev mode — normally rendered inside the Shell via Module Federation.

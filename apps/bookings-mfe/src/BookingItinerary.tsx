@@ -1,4 +1,5 @@
 import { useOutletContext } from "react-router-dom";
+import { HelperNote } from "@mfe/design-system";
 import type { Booking } from "./bookings";
 
 const STOPS = [
@@ -14,6 +15,11 @@ export function BookingItinerary() {
 
   return (
     <div>
+      <HelperNote>
+        Route: <code>/bookings/:cabinSlug/itinerary</code> — a literal path segment, sibling to
+        the index (Overview) and <code>guests</code> routes, all children of the same{" "}
+        <code>:cabinSlug</code> layout in BookingsApp.tsx.
+      </HelperNote>
       <p className="mfe-note">Itinerary for {booking.cabin}</p>
       {STOPS.map((stop) => (
         <div key={stop.day} className="mfe-row">

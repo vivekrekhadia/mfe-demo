@@ -35,10 +35,11 @@ export function BookingDetail() {
         <>
           <h3>{booking.cabin}</h3>
           <HelperNote>
-            <code>/bookings/{cabinSlug}</code> and its three tabs (Overview, Itinerary, Guests)
-            are routes this MFE owns entirely — the Shell's own route config only ever says{" "}
-            <code>/bookings/*</code>. Renaming or adding a tab here needs no Shell change or
-            redeploy.
+            Route: <code>/bookings/{cabinSlug}</code> — a layout, not a leaf: it renders the tabs
+            below and an <code>&lt;Outlet&gt;</code> for whichever child route currently matches
+            (Overview, Itinerary, Guests). All three are routes this MFE owns entirely — the
+            Shell's own route config only ever says <code>/bookings/*</code>. Renaming or adding
+            a tab here needs no Shell change or redeploy.
           </HelperNote>
           <nav className="mfe-subnav">
             <NavLink end to="." className={tabClass}>

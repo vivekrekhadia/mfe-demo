@@ -1,5 +1,5 @@
 import { Link, useOutletContext, useParams } from "react-router-dom";
-import { Icon } from "@mfe/design-system";
+import { Icon, HelperNote } from "@mfe/design-system";
 import type { Invoice } from "./payments";
 
 /**
@@ -19,6 +19,13 @@ export function LineItemDetail() {
         <Icon name="chevron-left" size={14} />
         Back to line items
       </Link>
+      <HelperNote>
+        Route: <code>/payments/:invoiceId/items/:itemId</code> — the deepest leaf in this MFE,
+        three <code>&lt;Route&gt;</code> levels below where the Shell mounted it. Its{" "}
+        <code>itemId</code> param and the <code>invoice</code> passed down through two layers of{" "}
+        <code>&lt;Outlet context&gt;</code> (InvoiceDetail then LineItemsLayout) both resolve
+        here.
+      </HelperNote>
       {item ? (
         <div className="mfe-row">
           <div className="mfe-row-title">{item.label}</div>

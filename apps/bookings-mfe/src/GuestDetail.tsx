@@ -1,5 +1,5 @@
 import { Link, useOutletContext, useParams } from "react-router-dom";
-import { Icon } from "@mfe/design-system";
+import { Icon, HelperNote } from "@mfe/design-system";
 import type { Booking } from "./bookings";
 
 /**
@@ -23,6 +23,12 @@ export function GuestDetail() {
         <Icon name="chevron-left" size={14} />
         Back to guests
       </Link>
+      <HelperNote>
+        Route: <code>/bookings/:cabinSlug/guests/:guestId</code> — the deepest leaf in this MFE,
+        three <code>&lt;Route&gt;</code> levels below where the Shell mounted it. Its{" "}
+        <code>guestId</code> param and the <code>booking</code> passed down through two layers of{" "}
+        <code>&lt;Outlet context&gt;</code> (BookingDetail then GuestsLayout) both resolve here.
+      </HelperNote>
       {guest ? (
         <div className="mfe-row">
           <div className="mfe-row-title">{guest.name}</div>

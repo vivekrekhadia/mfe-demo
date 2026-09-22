@@ -26,9 +26,10 @@ export function InvoiceDetail() {
         <>
           <h3>{invoice.label}</h3>
           <HelperNote>
-            <code>/payments/{invoiceId}</code> and its Summary / Line Items tabs are routes this
-            MFE owns entirely — the Shell's own route config only ever says{" "}
-            <code>/payments/*</code>.
+            Route: <code>/payments/{invoiceId}</code> — a layout, not a leaf: it renders the tabs
+            below and an <code>&lt;Outlet&gt;</code> for whichever child route currently matches
+            (Summary, Line Items). Both are routes this MFE owns entirely — the Shell's own route
+            config only ever says <code>/payments/*</code>.
           </HelperNote>
           <nav className="mfe-subnav">
             <NavLink end to="." className={tabClass}>

@@ -16,9 +16,10 @@ export function BookingsList() {
       <h2>Bookings</h2>
 
       <HelperNote>
-        This whole screen is the <code>bookings</code> remote's own <code>BookingsList</code>{" "}
-        component — loaded on demand via <code>import("bookings/BookingsApp")</code>, never
-        bundled into the Shell (see apps/shell/src/federation/remoteImports.ts).
+        Route: <code>/bookings</code> (index) — this whole screen is the <code>bookings</code>{" "}
+        remote's own <code>BookingsList</code> component, loaded on demand via{" "}
+        <code>import("bookings/BookingsApp")</code>, never bundled into the Shell (see
+        apps/shell/src/federation/remoteImports.ts).
       </HelperNote>
 
       {shellState?.session ? (

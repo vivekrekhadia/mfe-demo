@@ -9,9 +9,10 @@ export function ReviewsList() {
   return (
     <div>
       <HelperNote>
-        <code>/reviews</code> and <code>/reviews/:reviewId</code> are a third level of nested{" "}
-        <code>&lt;Route&gt;</code> — a child of a child — still entirely inside this one MFE. See
-        ReviewsLayout.tsx.
+        Route: <code>/dining/:restaurantSlug/reviews</code> (index). This and its sibling{" "}
+        <code>/reviews/:reviewId</code> are a third level of nested <code>&lt;Route&gt;</code> —
+        a child of a child — still entirely inside this one MFE. ReviewsLayout.tsx (the parent
+        route) renders no UI of its own, only an <code>&lt;Outlet&gt;</code>.
       </HelperNote>
       <p className="mfe-note">Reviews for {restaurant.name}</p>
       {restaurant.reviews.map((review) => (
