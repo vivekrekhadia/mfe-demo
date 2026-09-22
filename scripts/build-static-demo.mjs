@@ -11,7 +11,15 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 
-const MFES = ["bookings", "dining", "payment"];
+// Must include every name in @mfe/shared-types' MFE_NAMES — isMfeManifest()
+// validates ANY manifest against that full list regardless of which target
+// produced it, so leaving one out here doesn't just mean "that MFE is
+// missing," it fails schema validation and breaks the whole Shell (every
+// route, not just the missing one) on this target. signin-mfe's actual
+// sign-in flow is unreachable on this static target anyway (see api/session.json
+// below — it's a fixed always-200 stub, so AuthGate never has a reason to
+// route to /signin), but it still has to be present in the manifest.
+const MFES = ["bookings", "dining", "payment", "signin"];
 
 function versionOf(appDir) {
   const pkg = JSON.parse(readFileSync(path.join(root, "apps", appDir, "package.json"), "utf8"));
@@ -25,6 +33,7 @@ execFileSync(
     "--filter", "./apps/bookings-mfe",
     "--filter", "./apps/dining-mfe",
     "--filter", "./apps/payment-mfe",
+    "--filter", "./apps/signin-mfe",
     "run", "build",
   ],
   { cwd: root, stdio: "inherit" },
