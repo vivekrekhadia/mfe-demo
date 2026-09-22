@@ -9,6 +9,8 @@
   "scripts": {
     "build": "pnpm --filter ./apps/shell --filter ./apps/bookings-mfe --filter ./apps/dining-mfe --filter ./apps/payment-mfe --filter ./apps/signin-mfe run build",
     "build:static": "node scripts/build-static-demo.mjs",
+    "render:build": "node scripts/deploy-render.mjs",
+    "render:start": "pnpm --filter ship-server run start",
     "ship:server": "pnpm --filter ship-server run start",
     "ship:server:dev": "pnpm --filter ship-server run dev",
     "ship:build": "node scripts/build-release.mjs",

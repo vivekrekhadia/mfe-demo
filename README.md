@@ -421,6 +421,30 @@ This is still **not** a real identity system, deliberately:
   A real one — with an actual credential check — is a separate project from this one;
   `apps/ship-server/lib/auth.mjs` only proves the session/token half.
 
+### Two public deploy targets, and why login only works on one of them
+
+Besides the actual ship (`pnpm ship:server`), this repo can be deployed two other ways —
+and only one of them can run the auth flow above at all, because the other has no server:
+
+- **`pnpm build:static`** (`vercel.json`'s build command) produces a static bundle with
+  **no backend**: `/api/session` is rewritten to a fixed JSON file (always "authenticated",
+  nothing verified), and `/api/auth/login`, `/api/auth/logout`, `/api/crew-log` simply don't
+  exist there — any request to them 404s. This target exists to demo MFE delivery/routing
+  cheaply on a static host, not the auth flow.
+- **Render** (`render.yaml`, `pnpm run render:build` + `render:start`) runs the real
+  `apps/ship-server` Express process, so login/session/logout/crew-log all work exactly
+  like they do locally — `render:build` wraps the same build → deploy → activate pipeline
+  `ship:build`/`ship:deploy`/`ship:activate` run manually, with a unique release id derived
+  from the commit Render is building. Two things that matter specifically for running this
+  process behind a real public host rather than ship-local: `app.set("trust proxy", 1)` so
+  Express can see the original request was HTTPS (Render terminates TLS at its own edge and
+  forwards plain HTTP internally), and the session cookie's `Secure` flag is set from
+  `req.secure` rather than hardcoded, so the same code is correct both ship-local (plain
+  http, no `Secure` flag) and on Render (`Secure` flag set). Note Render's free-tier
+  filesystem is ephemeral — each deploy starts from a fresh container, so `ship:rollback`
+  and the activation history don't carry across deploys the way they would running this on
+  an actual ship.
+
 ## 4. Project structure
 
 ```

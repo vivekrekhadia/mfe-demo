@@ -17,6 +17,15 @@ const SHELL_DIR = path.join(PUBLIC_DIR, "shell");
 
 const app = express();
 app.disable("x-powered-by");
+// Render (and most Node hosts) terminate TLS at a proxy in front of this
+// process and forward plain HTTP internally, with the original protocol in
+// X-Forwarded-Proto. Without trusting that proxy, req.secure is always
+// false here even when the visitor is genuinely on https, and the session
+// cookie below would either never get the Secure flag it should have in
+// production, or would need a hardcoded assumption about the hosting
+// environment. `1` trusts exactly one hop (Render's own edge) — see
+// https://expressjs.com/en/guide/behind-proxies.html.
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -55,8 +64,10 @@ app.get("/api/session", (req, res) => {
 // anything: any non-empty username/password signs in as that username. On
 // success, issues an opaque server-side session token as an httpOnly
 // cookie (never exposed to page JS, so an XSS in any MFE can't read or
-// exfiltrate it) — that part is real, not a demo shortcut. `secure` is
-// intentionally omitted: this only ever runs over local http on the ship.
+// exfiltrate it) — that part is real, not a demo shortcut. `secure` is set
+// from req.secure (true behind Render's proxy thanks to `trust proxy`
+// above, false for local http) rather than hardcoded either way, so the
+// exact same code runs correctly ship-local and on a real public host.
 app.post("/api/auth/login", (req, res) => {
   const { username, password } = req.body ?? {};
   const displayName = authenticate(username, password);
@@ -65,13 +76,13 @@ app.post("/api/auth/login", (req, res) => {
     return;
   }
   const token = createSession(displayName);
-  res.cookie(SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", path: "/" });
+  res.cookie(SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: req.secure, path: "/" });
   res.json({ user: displayName, authenticatedVia: "ship-local-session" });
 });
 
 app.post("/api/auth/logout", (req, res) => {
   destroySession(req.cookies[SESSION_COOKIE]);
-  res.clearCookie(SESSION_COOKIE, { path: "/" });
+  res.clearCookie(SESSION_COOKIE, { sameSite: "lax", secure: req.secure, path: "/" });
   res.status(204).end();
 });
 

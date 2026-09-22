@@ -1,0 +1,17 @@
+# Render Blueprint (https://render.com/docs/blueprint-spec) — lets Render
+# configure this service automatically from the repo instead of needing
+# every field set by hand in the dashboard. Deploys apps/ship-server, the
+# real Express backend (persistent process, not the static Vercel build —
+# see vercel.json for that one and README "Authentication" for why the two
+# targets behave differently).
+services:
+  - type: web
+    name: offline-mfe-poc-ship-server
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile && pnpm run render:build
+    startCommand: pnpm run render:start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
