@@ -22,9 +22,8 @@ export function LineItemDetail() {
       <HelperNote>
         Route: <code>/payments/:invoiceId/items/:itemId</code> — the deepest leaf in this MFE,
         three <code>&lt;Route&gt;</code> levels below where the Shell mounted it. Its{" "}
-        <code>itemId</code> param and the <code>invoice</code> passed down through two layers of{" "}
-        <code>&lt;Outlet context&gt;</code> (InvoiceDetail then LineItemsLayout) both resolve
-        here.
+        <code>itemId</code> param and the <code>invoice</code> passed down through two levels of{" "}
+        <code>&lt;Outlet context&gt;</code> above both resolve here.
       </HelperNote>
       {item ? (
         <div className="mfe-row">

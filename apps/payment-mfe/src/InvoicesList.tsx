@@ -9,10 +9,8 @@ export function InvoicesList() {
       <h2>Payments</h2>
 
       <HelperNote>
-        Route: <code>/payments</code> (index) — this whole screen is the <code>payment</code>{" "}
-        remote's own <code>InvoicesList</code> component, loaded on demand via{" "}
-        <code>import("payment/PaymentApp")</code>, never bundled into the Shell (see
-        apps/shell/src/federation/remoteImports.ts).
+        Route: <code>/payments</code> (index) — this whole screen is loaded on demand via Module
+        Federation, never bundled into the Shell.
       </HelperNote>
 
       <h3>Recent invoices</h3>

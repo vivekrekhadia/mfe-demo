@@ -152,6 +152,19 @@
   border-radius: 4px;
 }
 
+/* Marks a specific piece of on-screen data (not a whole note) as having
+   come from somewhere notable — e.g. the session name an MFE displays but
+   never fetched itself, because it read it from the Shell's shared state.
+   Deliberately a highlighter-pen look, not a badge or button, so it reads
+   as "look at this value" rather than as an interactive element. */
+.ds-highlight {
+  background: var(--ds-color-accent-bg);
+  color: var(--ds-color-accent-dark);
+  padding: 1px 6px;
+  border-radius: var(--ds-radius-sm);
+  font-weight: 700;
+}
+
 /* Base page look, and the .mfe-* content classes every MFE's own screens
    use (panels, rows, sub-nav tabs, back-links, ...). These live here —
    not in the Shell — because they are rendered from INSIDE an MFE's own

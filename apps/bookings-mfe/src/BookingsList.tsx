@@ -16,18 +16,18 @@ export function BookingsList() {
       <h2>Bookings</h2>
 
       <HelperNote>
-        Route: <code>/bookings</code> (index) — this whole screen is the <code>bookings</code>{" "}
-        remote's own <code>BookingsList</code> component, loaded on demand via{" "}
-        <code>import("bookings/BookingsApp")</code>, never bundled into the Shell (see
-        apps/shell/src/federation/remoteImports.ts).
+        Route: <code>/bookings</code> (index) — this whole screen is loaded on demand via Module
+        Federation, never bundled into the Shell.
       </HelperNote>
 
       {shellState?.session ? (
-        <p className="mfe-note">
-          Signed in as {shellState.session.user} (via Shell state, not a re-fetch)
-        </p>
+        <HelperNote>
+          Signed in as <mark className="ds-highlight">{shellState.session.user}</mark> — this
+          name is coming straight from the Shell's shared state, not something this MFE fetched
+          itself.
+        </HelperNote>
       ) : (
-        <p className="mfe-note">No Shell state available (standalone dev mode)</p>
+        <HelperNote>No Shell state available (standalone dev mode).</HelperNote>
       )}
 
       <h3>Upcoming bookings</h3>

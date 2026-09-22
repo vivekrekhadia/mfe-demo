@@ -11,8 +11,8 @@ export function GuestsList() {
       <HelperNote>
         Route: <code>/bookings/:cabinSlug/guests</code> (index). This and its sibling{" "}
         <code>/guests/:guestId</code> are a third level of nested <code>&lt;Route&gt;</code> — a
-        child of a child — still entirely inside this one MFE. GuestsLayout.tsx (the parent
-        route) renders no UI of its own, only an <code>&lt;Outlet&gt;</code>.
+        child of a child — still entirely inside this one MFE. The parent route above renders no
+        UI of its own, only an <code>&lt;Outlet&gt;</code>.
       </HelperNote>
       <p className="mfe-note">Guests in {booking.cabin}</p>
       {booking.guests.map((guest) => (

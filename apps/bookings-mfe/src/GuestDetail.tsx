@@ -26,8 +26,8 @@ export function GuestDetail() {
       <HelperNote>
         Route: <code>/bookings/:cabinSlug/guests/:guestId</code> — the deepest leaf in this MFE,
         three <code>&lt;Route&gt;</code> levels below where the Shell mounted it. Its{" "}
-        <code>guestId</code> param and the <code>booking</code> passed down through two layers of{" "}
-        <code>&lt;Outlet context&gt;</code> (BookingDetail then GuestsLayout) both resolve here.
+        <code>guestId</code> param and the <code>booking</code> passed down through two levels of{" "}
+        <code>&lt;Outlet context&gt;</code> above both resolve here.
       </HelperNote>
       {guest ? (
         <div className="mfe-row">

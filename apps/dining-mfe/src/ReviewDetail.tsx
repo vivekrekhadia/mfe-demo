@@ -23,8 +23,7 @@ export function ReviewDetail() {
         Route: <code>/dining/:restaurantSlug/reviews/:reviewId</code> — the deepest leaf in this
         MFE, three <code>&lt;Route&gt;</code> levels below where the Shell mounted it. Its{" "}
         <code>reviewId</code> param and the <code>restaurant</code> passed down through two
-        layers of <code>&lt;Outlet context&gt;</code> (RestaurantDetail then ReviewsLayout) both
-        resolve here.
+        levels of <code>&lt;Outlet context&gt;</code> above both resolve here.
       </HelperNote>
       {review ? (
         <div className="mfe-row">
