@@ -21,13 +21,12 @@ export function BookingsList() {
       </HelperNote>
 
       {shellState?.session ? (
-        <HelperNote>
-          Signed in as <mark className="ds-highlight">{shellState.session.user}</mark> — this
-          name is coming straight from the Shell's shared state, not something this MFE fetched
-          itself.
-        </HelperNote>
+        <p className="mfe-note">
+          Signed in as <mark className="ds-highlight">{shellState.session.user}</mark> (via Shell
+          state, not a re-fetch)
+        </p>
       ) : (
-        <HelperNote>No Shell state available (standalone dev mode).</HelperNote>
+        <p className="mfe-note">No Shell state available (standalone dev mode)</p>
       )}
 
       <h3>Upcoming bookings</h3>
