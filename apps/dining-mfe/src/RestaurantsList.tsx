@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { Badge, Button, HelperNote } from "@mfe/design-system";
+import { Badge, Button, HelperNote, RouteErrorBoundary } from "@mfe/design-system";
 import { restaurants } from "./dining";
+import { ChefSpecial } from "./ChefSpecial";
 import { CrashDemo } from "./CrashDemo";
 
 /** "/dining" (index) — links to "/dining/:restaurantSlug", a real URL, not local state. */
@@ -30,7 +31,21 @@ export function RestaurantsList() {
         </div>
       ))}
 
-      <CrashDemo screen="Dining home" />
+      <h3>Chef's special</h3>
+      {/* Nested inside its own boundary, separate from the "dining:index"
+          one DiningApp.tsx wraps this whole component in — so breaking it
+          shows an error only in this one section, right here on the
+          Dining home page, with the restaurant list above staying fully
+          visible. This is deliberately visible without navigating anywhere
+          else: someone presenting this who never clicks into a
+          restaurant's Menu (see Menu.tsx for the same pattern one level
+          deeper) still sees a real partial-break — of a real feature
+          (ChefSpecial's "Notify galley" button), not just an inert demo
+          button with nothing behind it. */}
+      <RouteErrorBoundary key="crash-demo" id="dining:index:crash-demo" label="Chef's special">
+        <ChefSpecial restaurantName="Ocean Restaurant" dish="Grilled Salmon" price="$28" />
+        <CrashDemo screen="Chef's special" />
+      </RouteErrorBoundary>
     </section>
   );
 }
