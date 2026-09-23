@@ -1,6 +1,7 @@
 import { useOutletContext } from "react-router-dom";
 import { HelperNote } from "@mfe/design-system";
 import type { Restaurant } from "./dining";
+import { CrashDemo } from "./CrashDemo";
 
 /** "/dining/:restaurantSlug" (index) — the default tab of RestaurantDetail's layout. */
 export function Menu() {
@@ -20,6 +21,8 @@ export function Menu() {
           <div>{item.price}</div>
         </div>
       ))}
+
+      <CrashDemo screen="Menu" />
     </div>
   );
 }

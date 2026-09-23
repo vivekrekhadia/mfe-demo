@@ -6,6 +6,7 @@ import { Route, Routes } from "react-router-dom";
 // import("bookings/BookingsApp"). Preflight/theme (@mfe/design-system's
 // tailwind.css) is NOT imported here — the Shell owns that one global copy.
 import "./tailwind.css";
+import { RouteErrorBoundary } from "@mfe/design-system";
 import { BookingsList } from "./BookingsList";
 import { BookingDetail } from "./BookingDetail";
 import { BookingOverview } from "./BookingOverview";
@@ -31,17 +32,71 @@ import { GuestDetail } from "./GuestDetail";
  *   /bookings/:cabinSlug/itinerary     BookingItinerary      (level 2 sibling)
  *   /bookings/:cabinSlug/guests        GuestsLayout          (level 2 sibling, itself a layout)
  *   /bookings/:cabinSlug/guests/:id    GuestDetail            (level 3 — a child of a child)
+ *
+ * Every route's own element is wrapped in its own <RouteErrorBoundary> —
+ * see apps/dining-mfe/src/DiningApp.tsx for why the per-route `key`s are
+ * required (not decorative) and why static per-route strings are enough
+ * given every path into a nested screen goes through the index route first.
  */
 export function BookingsApp() {
   return (
     <Routes>
-      <Route index element={<BookingsList />} />
-      <Route path=":cabinSlug" element={<BookingDetail />}>
-        <Route index element={<BookingOverview />} />
-        <Route path="itinerary" element={<BookingItinerary />} />
-        <Route path="guests" element={<GuestsLayout />}>
-          <Route index element={<GuestsList />} />
-          <Route path=":guestId" element={<GuestDetail />} />
+      <Route
+        index
+        element={
+          <RouteErrorBoundary key="index" id="bookings:index" label="Bookings home">
+            <BookingsList />
+          </RouteErrorBoundary>
+        }
+      />
+      <Route
+        path=":cabinSlug"
+        element={
+          <RouteErrorBoundary key="detail" id="bookings:detail" label="Booking details">
+            <BookingDetail />
+          </RouteErrorBoundary>
+        }
+      >
+        <Route
+          index
+          element={
+            <RouteErrorBoundary key="overview" id="bookings:overview" label="Booking overview">
+              <BookingOverview />
+            </RouteErrorBoundary>
+          }
+        />
+        <Route
+          path="itinerary"
+          element={
+            <RouteErrorBoundary key="itinerary" id="bookings:itinerary" label="Itinerary">
+              <BookingItinerary />
+            </RouteErrorBoundary>
+          }
+        />
+        <Route
+          path="guests"
+          element={
+            <RouteErrorBoundary key="guests-layout" id="bookings:guests-layout" label="Guests">
+              <GuestsLayout />
+            </RouteErrorBoundary>
+          }
+        >
+          <Route
+            index
+            element={
+              <RouteErrorBoundary key="guests-index" id="bookings:guests-index" label="Guests">
+                <GuestsList />
+              </RouteErrorBoundary>
+            }
+          />
+          <Route
+            path=":guestId"
+            element={
+              <RouteErrorBoundary key="guest-detail" id="bookings:guest-detail" label="Guest details">
+                <GuestDetail />
+              </RouteErrorBoundary>
+            }
+          />
         </Route>
       </Route>
     </Routes>

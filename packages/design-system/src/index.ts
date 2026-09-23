@@ -8,4 +8,6 @@ export { Icon } from "./Icon";
 export type { IconProps, IconName } from "./Icon";
 export { HelperNote } from "./HelperNote";
 export type { HelperNoteProps } from "./HelperNote";
+export { RouteErrorBoundary } from "./RouteErrorBoundary";
+export type { RouteErrorBoundaryProps } from "./RouteErrorBoundary";
 export { tokens } from "./tokens";

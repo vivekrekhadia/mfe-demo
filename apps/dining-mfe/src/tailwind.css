@@ -2,6 +2,7 @@
 @layer theme {
   :root, :host {
     --dn-spacing: 0.25rem;
+    --dn-color-ds-danger: var(--ds-color-danger);
   }
 }
 @layer theme;
@@ -12,6 +13,9 @@
   .dn\:mt-2 {
     margin-top: calc(var(--dn-spacing) * 2);
   }
+  .dn\:mt-6 {
+    margin-top: calc(var(--dn-spacing) * 6);
+  }
   .dn\:flex {
     display: flex;
   }
@@ -20,5 +24,11 @@
   }
   .dn\:gap-2 {
     gap: calc(var(--dn-spacing) * 2);
+  }
+  .dn\:border-ds-danger {
+    border-color: var(--dn-color-ds-danger);
+  }
+  .dn\:text-ds-danger {
+    color: var(--dn-color-ds-danger);
   }
 }

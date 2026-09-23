@@ -230,7 +230,21 @@ function AppShell({ state, reload }: Pick<ReturnType<typeof useShipManifest>, "s
             <RouteOwnershipBanner />
             <Routes>
               {ROUTES.map((r) => (
-                <Route key={r.path} path={r.path} element={<RemoteLoader label={r.label} loader={r.loader} />} />
+                <Route
+                  key={r.path}
+                  path={r.path}
+                  // key={r.path} on RemoteLoader itself (not just on Route)
+                  // matters: every route renders the exact same RemoteLoader
+                  // component type at the same position in the tree, so
+                  // without a distinguishing key React treats a tab switch
+                  // as "update this instance's props," not "unmount and
+                  // remount" — including its RemoteErrorBoundary child,
+                  // whose `hasError` would then persist across tabs (a crash
+                  // on one MFE staying "stuck" showing on whichever MFE you
+                  // navigate to next, confirmed via instance-id tracing).
+                  // The key forces a real remount on every route change.
+                  element={<RemoteLoader key={r.path} label={r.label} loader={r.loader} />}
+                />
               ))}
               <Route path="*" element={<Navigate to="/bookings" replace />} />
             </Routes>

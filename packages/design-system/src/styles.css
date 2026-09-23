@@ -372,3 +372,33 @@ button {
   border-color: var(--ds-color-navy-light);
   font-weight: 600;
 }
+
+/* RouteErrorBoundary's fallback (see RouteErrorBoundary.tsx) — an MFE's
+   own per-route crash, scoped to just the one screen that broke. Visually
+   similar to the Shell's .mfe-slot-error (same danger-colored-card
+   language), but a genuinely separate, shared class: this one has to be
+   usable by MFE content itself, and .mfe-slot-error is Shell-chrome-only
+   (see apps/shell/src/styles.css's header comment). */
+.ds-route-error {
+  background: var(--ds-color-danger-bg);
+  border: 1px solid var(--ds-color-danger);
+  border-radius: var(--ds-radius-md);
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.ds-route-error-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--ds-color-danger);
+  margin: 0 0 6px;
+}
+
+.ds-route-error-detail {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--ds-color-text);
+  font-family: ui-monospace, monospace;
+}

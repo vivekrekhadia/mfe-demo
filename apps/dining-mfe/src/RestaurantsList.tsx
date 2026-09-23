@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Badge, Button, HelperNote } from "@mfe/design-system";
 import { restaurants } from "./dining";
+import { CrashDemo } from "./CrashDemo";
 
 /** "/dining" (index) — links to "/dining/:restaurantSlug", a real URL, not local state. */
 export function RestaurantsList() {
@@ -28,6 +29,8 @@ export function RestaurantsList() {
           </div>
         </div>
       ))}
+
+      <CrashDemo screen="Dining home" />
     </section>
   );
 }
