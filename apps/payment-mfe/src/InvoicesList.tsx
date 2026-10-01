@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge, Button, HelperNote } from "@mfe/design-system";
+import { EmbeddedSite } from "./EmbeddedSite";
 import { invoices } from "./payments";
 
 /** "/payments" (index) — links to "/payments/:invoiceId", a real URL, not local state. */
@@ -12,6 +13,8 @@ export function InvoicesList() {
         Route: <code>/payments</code> (index) — this whole screen is loaded on demand via Module
         Federation, never bundled into the Shell.
       </HelperNote>
+
+      <EmbeddedSite />
 
       <h3>Recent invoices</h3>
       {invoices.map((inv) => (

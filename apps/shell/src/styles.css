@@ -167,10 +167,19 @@
   }
 }
 
-.shell-header {
+/* Sticky as one unit with .shell-nav (see .shell-topbar below) rather
+   than each sticking independently — .shell-header's own height isn't
+   fixed (flex-wrap above lets the "Ship-side · offline ready" badge drop
+   to a second line on narrow viewports), so a hardcoded `top` offset on
+   .shell-nav alone would drift out of sync with the header's actual
+   rendered height. */
+.shell-topbar {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.shell-header {
   background: linear-gradient(135deg, var(--ds-color-navy) 0%, var(--ds-color-navy-light) 100%);
   color: white;
   padding: 16px 24px;

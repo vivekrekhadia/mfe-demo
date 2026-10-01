@@ -171,41 +171,50 @@ function AuthGate({ manifestState, reload, sessionState }: AuthGateProps) {
 function AppShell({ state, reload }: Pick<ReturnType<typeof useShipManifest>, "state" | "reload">) {
   return (
     <div className="shell-app">
-      <header className="shell-header">
-        <div className="shell-brand">
-          <span className="shell-brand-mark">
-            <Icon name="anchor" size={19} />
-          </span>
-          <div className="sh:flex sh:items-center sh:gap-2">
-            <h1>Cruise Ship Portal</h1>
-            <span className="sh:hidden sh:sm:inline-flex sh:items-center sh:gap-1.5 sh:rounded-ds-pill sh:bg-ds-navy-light sh:px-3 sh:py-1 sh:text-xs sh:text-white">
-              <span className="sh:h-1.5 sh:w-1.5 sh:rounded-full sh:bg-ds-accent sh:animate-pulse" />
-              Ship-side · offline ready
+      {/* Wrapping header+nav in one sticky unit (rather than making each
+          sticky separately) means the nav always sits directly under the
+          header regardless of the header's own actual height — which
+          varies (the "Ship-side · offline ready" badge wraps to a second
+          line on narrow viewports, via flex-wrap on .shell-header) — a
+          hardcoded `top` offset on the nav alone would either leave a gap
+          or overlap depending on viewport width. */}
+      <div className="shell-topbar">
+        <header className="shell-header">
+          <div className="shell-brand">
+            <span className="shell-brand-mark">
+              <Icon name="anchor" size={19} />
             </span>
+            <div className="sh:flex sh:items-center sh:gap-2">
+              <h1>Cruise Ship Portal</h1>
+              <span className="sh:hidden sh:sm:inline-flex sh:items-center sh:gap-1.5 sh:rounded-ds-pill sh:bg-ds-navy-light sh:px-3 sh:py-1 sh:text-xs sh:text-white">
+                <span className="sh:h-1.5 sh:w-1.5 sh:rounded-full sh:bg-ds-accent sh:animate-pulse" />
+                Ship-side · offline ready
+              </span>
+            </div>
           </div>
-        </div>
-        <div className="sh:flex sh:items-center sh:gap-2">
-          <HelperNotesToggle />
-          <SessionBadge />
-        </div>
-      </header>
+          <div className="sh:flex sh:items-center sh:gap-2">
+            <HelperNotesToggle />
+            <SessionBadge />
+          </div>
+        </header>
 
-      <nav className="shell-nav">
-        {ROUTES.map((r) => (
-          <NavLink
-            key={r.path}
-            // Strip the trailing "/*" (a Route-matching pattern, not a
-            // navigable URL) so the tab always links to the MFE's base
-            // path; NavLink's default non-"end" matching still marks it
-            // active for any of that MFE's sub-routes too.
-            to={r.path.replace(/\/\*$/, "")}
-            className={({ isActive }) => (isActive ? "nav-tab nav-tab-active" : "nav-tab")}
-          >
-            <Icon name={r.icon} size={15} />
-            {r.label}
-          </NavLink>
-        ))}
-      </nav>
+        <nav className="shell-nav">
+          {ROUTES.map((r) => (
+            <NavLink
+              key={r.path}
+              // Strip the trailing "/*" (a Route-matching pattern, not a
+              // navigable URL) so the tab always links to the MFE's base
+              // path; NavLink's default non-"end" matching still marks it
+              // active for any of that MFE's sub-routes too.
+              to={r.path.replace(/\/\*$/, "")}
+              className={({ isActive }) => (isActive ? "nav-tab nav-tab-active" : "nav-tab")}
+            >
+              <Icon name={r.icon} size={15} />
+              {r.label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
 
       {state.status === "ready" && <ReleaseInfo manifest={state.manifest} />}
 

@@ -497,6 +497,16 @@ Federated Module Federation loading only really "happens" once real, built
 `ship:*` pipeline below sets up. That pipeline is the actual way to see the whole system
 running together.
 
+**Seeing a source change in the full app:** the Ship Server only serves immutable releases,
+so after editing any MFE or the Shell you must build, deploy and activate a *new* release
+id (existing ids can't be overwritten), then hard-refresh:
+
+```bash
+pnpm ship:build <new-release> && pnpm ship:deploy <new-release> && pnpm ship:activate <new-release>
+```
+
+For quick iteration without a release, use the per-app `dev` commands above.
+
 ## 7. Release management commands
 
 ```bash
