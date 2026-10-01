@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, HelperNote } from "@mfe/design-system";
+import { Button } from "@mfe/design-system";
 
 interface CrashDemoProps {
   /** What screen this instance is embedded in — shown in the button/copy and thrown as the error's own message, so RouteErrorBoundary's fallback says exactly which demo triggered it. */
@@ -27,10 +27,12 @@ export function CrashDemo({ screen }: CrashDemoProps) {
   return (
     <div className="dn:mt-6">
       <h3>Crash demo (error boundary)</h3>
-      <HelperNote>
+      {/* Plain red text, not <HelperNote>: that hides when the presenter turns helper notes
+          off, and this warning must stay visible — it marks the button that breaks the page. */}
+      <p className="dn:text-ds-danger dn:font-semibold">
         Throws inside just this screen's render — only this slot shows an error; everything
         around it (layout, tabs, other routes) keeps working.
-      </HelperNote>
+      </p>
       <Button
         variant="secondary"
         className="dn:mt-2 dn:border-ds-danger dn:text-ds-danger"
